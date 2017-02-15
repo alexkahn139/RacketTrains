@@ -83,4 +83,3 @@
                 (if d
                     (detection-block-id d)
                     #f))|#
-(define rwm-be (load-rwm "be_simple.txt"))
