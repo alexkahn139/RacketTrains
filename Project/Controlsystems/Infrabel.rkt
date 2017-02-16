@@ -42,4 +42,5 @@
 
       (else (error "Unknown message"))
       ))
+  (start-simulator)
   dispatch)
