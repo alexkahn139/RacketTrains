@@ -27,8 +27,9 @@
                   (define id (train 'get-id))
                   (if (eq? (get-locomotive-location id) track-id)
                       (set! light 'red)
-                      'ok))))
-      (look-up (rwm-ls rwm))
+                      'ok))
+                trains))
+      (look-up (rwm-ls railwaymodel))
       light)
   (define (dispatch msg)
     (cond
@@ -42,4 +43,5 @@
 
       (else (error "Unknown message"))
       ))
+  (start-simulator)
   dispatch)
