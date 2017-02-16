@@ -20,12 +20,23 @@
     (get-switch-position id))
   (define (set-switch-state! id new-pos)
     (set-switch-position! id new-pos))
+  (define (get-light track-id)
+    (define light 'green)
+    (define (look-up trains)
+      (for-each (lambda (train)
+                  (define id (train 'get-id))
+                  (if (eq? (get-locomotive-location id) track-id)
+                      (set! light 'red)
+                      'ok))))
+      (look-up (rwm-ls rwm))
+      light)
   (define (dispatch msg)
     (cond
       ; Getters
       ((eq? msg 'get-locomotive-speed) get-locomotive-speed)
       ((eq? msg 'get-locomotive-location) get-locomotive-location)
       ((eq? msg 'get-switch-state) get-switch-state)
+      ((eq? msg 'get-light) get-light)
       ; Setters
       ((eq? msg 'set-switch-state!) set-switch-state!)
 
