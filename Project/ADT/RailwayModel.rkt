@@ -16,7 +16,8 @@
          ;find-track
          ;find-dt
          ;find-nodes-middle
-         ;track-eqv?
+         track-eqv?
+         is-detection-track?
          )
 
 (struct rwm (ls ns ss ts ds))
@@ -72,6 +73,11 @@
              (eqv? (t1 'get-node2)
                   (t2 'get-node1)))))
 
+(define (is-detection-track? railwaymodel n1 n2)
+  (findf (lambda (detectiontrack)
+              (define testtrack (make-track n1 n2))
+              (track-eqv? detectiontrack testtrack))
+            (rwm-ds railwaymodel)))
 #|
 ; Find a detection block in a railway model.
 (define (find-db rwm n1 n2)

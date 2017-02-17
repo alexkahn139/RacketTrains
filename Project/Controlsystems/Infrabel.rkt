@@ -31,6 +31,22 @@
                 trains))
       (look-up (rwm-ls railwaymodel))
       light)
+(define (get-next-detection-track train)
+  (define schedule ((train 'get-schedule))) ;; Schedule exists of the Required Nodes
+  (if (not (null? schedule))
+      (begin
+        ((train 'set-schedule) (cddr schedule))
+        (define first-node (car schedule))
+        (define second-node (cadr schedule))
+        if )
+
+      #f))
+(define (move-train train)
+  (define next (get-next-detection-track train))
+  (define t-id (next 'get-id))
+  ;(if (and next (get)))
+  'ok)
+
   (define (dispatch msg)
     (cond
       ; Getters
