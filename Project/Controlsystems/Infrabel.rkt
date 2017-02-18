@@ -44,13 +44,19 @@
         (if (detection-track)
             (begin ((detection-track 'get-id)) ((train 'set-schedule) (cddr schedule)))
             (begin ((train 'set-schedule) cdr schedule) (get-next-detection-track train)
-              )))
+              ))
+        detection-track)
       #f))
-(define (move-train train)
-  (define next (get-next-detection-track train))
-  (define t-id (next 'get-id))
-  ;(if (and next (get)))
-  'ok)
+  (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
+    (define id (switch 'get-id))
+    (if (eq? (switch 'get-node1) nA)
+        (if (eq? (switch 'get-node2) nB)
+            (set-switch-state! id 1)
+            (set-switch-state! id 2))
+        (if (eq? (switch 'get-node2) nA)
+            (set-switch-state! id 1)
+            (set-switch-state! id 2))))
+
 
   (define (dispatch msg)
     (cond
