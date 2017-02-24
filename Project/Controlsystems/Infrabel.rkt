@@ -12,7 +12,7 @@
   (define railwaymodel (load-rwm "../ADT/be_simple.txt"))
   ;; Speed of the train
   (define (get-locomotive-speed id)
-      (get-loco-speed id))
+    (get-loco-speed id))
   ;; Location of the train, if it is on a detection-block
   (define (get-locomotive-location id)
     (get-loco-detection-block id))
@@ -29,24 +29,24 @@
                       (set! light 'red)
                       'ok))
                 trains))
-      (look-up (rwm-ls railwaymodel))
-      light)
-(define (get-next-detection-track train)
-  (define first-node '())
-  (define second-node '())
-  (define detection-track '())
-  (define schedule ((train 'get-schedule))) ;; Schedule exists of the Required Nodes
-  (if (not (null? schedule))
-      (begin
-        (set! first-node (car schedule))
-        (set! second-node (cadr schedule))
-        (set! detection-track (is-detection-track? first-node second-node))
-        (if (detection-track)
-            (begin ((detection-track 'get-id)) ((train 'set-schedule) (cddr schedule)))
-            (begin ((train 'set-schedule) cdr schedule) (get-next-detection-track train)
-              ))
-        detection-track)
-      #f))
+    (look-up (rwm-ls railwaymodel))
+    light)
+  (define (get-next-detection-track train)
+    (define first-node '())
+    (define second-node '())
+    (define detection-track '())
+    (define schedule ((train 'get-schedule))) ;; Schedule exists of the Required Nodes
+    (if (not (null? schedule))
+        (begin
+          (set! first-node (car schedule))
+          (set! second-node (cadr schedule))
+          (set! detection-track (is-detection-track? first-node second-node))
+          (if (detection-track)
+              (begin ((detection-track 'get-id)) ((train 'set-schedule) (cddr schedule)))
+              (begin ((train 'set-schedule) cdr schedule) (get-next-detection-track train)
+                     ))
+          detection-track)
+        #f))
   (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
     (define id (switch 'get-id))
     (if (eq? (switch 'get-node1) nA)
@@ -56,7 +56,12 @@
         (if (eq? (switch 'get-node2) nA)
             (set-switch-state! id 1)
             (set-switch-state! id 2))))
-
+  (define (calculate-direction node1 node2)
+    (define track (get-track node1 node2))
+    (define direction 0)
+    (if (eq? ((track 'get-node1)) node1)
+        (set! direction +1)
+        (set! direction -1)))
 
   (define (dispatch msg)
     (cond
