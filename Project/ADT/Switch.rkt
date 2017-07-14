@@ -7,7 +7,7 @@
 
 (provide make-switch)
 
-(define (make-switch id max-speed node1 node2 node3)
+(define (make-switch id node1 node2 node3)
     (define type 'switch)
     (define occupied #f)
 
@@ -26,7 +26,6 @@
             ((eq? msg 'get-node2) node2)
             ((eq? msg 'get-node3) node3)
             ((eq? msg 'occupied?) occupied)
-            ((eq? msg 'get-max-speed) max-speed)
             ; setters
             ((eq? msg 'free!) free!)
             ((eq? msg 'occupy!) occupy!)

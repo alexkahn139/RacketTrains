@@ -1,0 +1,4 @@
+*.zo
+*.dep
+*.rkt~
+*.DS_Store
