@@ -89,4 +89,17 @@
 			(define t1 (make-track node1 node2))
 			(define t2 (make-track (dt 'get-node1) (dt 'get-node2)))
 			(when (track-eqv? t1 t2)
-				(set! detectiontrack (id dt))))))
+				(set! detectiontrack (id dt))))
+	detectiontrack))
+
+(define (get-switch rwm node1 node2)
+	(define switch #f)
+	(hash-for-each (rwm-ss rwm)
+		(lambda (id s)
+			(define t1 (make-track node1 node2))
+			(define t2 (make-track (s 'get-node1) (s 'get-node2)))
+			(define t3 (make-track (s 'get-node1) (s 'get-node2)))
+			(when (or (track-eqv? t1 t2) (track-eqv? t1 t3))
+				(set! switch (id s))))
+	switch))
+;todo find-switches and find-nodes-middle
