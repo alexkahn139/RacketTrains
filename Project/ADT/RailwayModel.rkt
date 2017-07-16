@@ -9,6 +9,7 @@
 (require "Track.rkt")
 (require "Train.rkt")
 (require "Node.rkt")
+(require "DetectionTrack.rkt")
 
 (provide (struct-out rwm)
          load-rwm
@@ -18,18 +19,18 @@
          ;find-nodes-middle
          get-track
          track-eqv?
-         is-detection-track?
+         get-dt
          )
 
-(struct rwm (ls ns ss ts ds))
+(struct rwm (ls ns ss ts dt))
 ; Based on the file given by the assitants
 (define (load-rwm filename)
   (let ([lines (map string-split (file->lines filename))]
-        [ls '()]
-        [ns '()]
-        [ss '()]
+        [ls (make-hash)]
+        [ns (make-hash)]
+        [ss (make-hash)]
         [ts '()]
-        [ds '()])
+        [ds (make-hash)])
     (for-each
      (lambda (l)
        (case (string->symbol (car l))
@@ -37,30 +38,30 @@
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [res (make-train id)])
-                (set! ls (cons res ls)))]
+                (hash-set! ls id res))]
          [(N) (let* ([id (string->symbol (list-ref l 1))]
                      [x (string->number (list-ref l 2))]
                      [y (string->number (list-ref l 3))]
                      [res (make-node id x y)])
-                (set! ns (cons res ns)))]
+                (hash-set! ns id res))]
          [(S) (let* ([nm (string->symbol (list-ref l 1))]
                      [n0 (string->symbol (list-ref l 2))]
                      [n1 (string->symbol (list-ref l 3))]
                      [n2 (string->symbol (list-ref l 4))]
                      [ms (string->symbol (list-ref l 5))]
                      [res (make-switch nm ms n0 n1 n2)])
-                (set! ss (cons res ss)))]
+                (hash-set! ss nm res))]
          [(T) (let* ([n1 (string->symbol (list-ref l 1))]
                      [n2 (string->symbol (list-ref l 2))]
                      [ms (string->symbol (list-ref l 3))]
-                     [res (make-track ms n1 n2)])
+                     [res (make-track n1 n2 ms)])
                 (set! ts (cons res ts)))]
          [(D) (let* ([id (string->symbol (list-ref l 1))]
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [ms (string->symbol (list-ref l 4))]
-                     [res (make-track ms n1 n2 'detection-block id)])
-                (set! ds (cons res ds)))]))
+                     [res (make-dt id n1 n2 ms)])
+                (hash-set! ds id res))]))
      lines)
     (rwm ls ns ss ts ds)))
 
@@ -74,24 +75,18 @@
              (eqv? (t1 'get-node2)
                   (t2 'get-node1)))))
 
-(define (is-detection-track? railwaymodel n1 n2)
-  (findf (lambda (detectiontrack)
-              (define testtrack (make-track n1 n2))
-              (track-eqv? detectiontrack testtrack))
-            (rwm-ds railwaymodel)))
+
 (define (get-track node1 node2)
   (findf (lambda (track)
             (define testtrack (make-track node1 node2))
             (track-eqv? track testtrack))
           (rwm-ts)))
-#|
-; Find a detection block in a railway model.
-(define (find-db rwm n1 n2)
-    (define d (findf (lambda (db)
-       (let ([t1 (make-track n1 n2)]
-             [t2 (make-detection-block-track db)])
-                (track-eqv? t1 t2)))
-                (rwm-ds rwm)))
-                (if d
-                    (detection-block-id d)
-                    #f))|#
+
+(define (get-dt node1 node2)
+	(define detectiontrack #f)
+	(hash-for-each (rwm-dt rwm)
+		(lambda (id dt)
+			(define t1 (make-track node1 node2))
+			(define t2 (make-track (dt 'get-node1) (dt 'get-node2)))
+			(when (track-eqv? t1 t2)
+				(set! detectiontrack (id dt))))))

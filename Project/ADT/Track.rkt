@@ -7,7 +7,7 @@
 
 (provide make-track)
 
-(define (make-track [max-speed 10] node1 node2) ; Zo kan er ook een detecion track aangemaakt worden
+(define (make-track node1 node2 [max-speed 10]) 
 	 (define type 'track)
     (define occupied #f)
 

@@ -9,7 +9,7 @@
 
 (provide make-dt)
 
-(define (make-dt id [max-speed 10] node1 node2)
+(define (make-dt id node1 node2 [max-speed 10])
   (define type 'track)
   (define occupied #f)
 
