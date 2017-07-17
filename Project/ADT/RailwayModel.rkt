@@ -102,4 +102,9 @@
 			(when (or (track-eqv? t1 t2) (track-eqv? t1 t3))
 				(set! switch (id s))))
 	switch))
-;todo find-switches and find-nodes-middle
+(define (find-nodes-middle node1 node2)
+	(define x1 (node1 'get-x))
+	(define y1 (node1 'get-y))
+	(define x2 (node2 'get-x))
+	(define y2 (node2 'get-y))
+	(cons (/ (+ x1 x2) 2) (/ (+ y1 y2) 2)))
