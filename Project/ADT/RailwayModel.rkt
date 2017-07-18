@@ -47,7 +47,7 @@
                      [n1 (string->symbol (list-ref l 3))]
                      [n2 (string->symbol (list-ref l 4))]
                      [ms (string->symbol (list-ref l 5))]
-                     [res (make-switch nm ms n0 n1 n2)])
+                     [res (make-switch nm n0 n1 n2)])
                 (hash-set! ss nm res))]
          [(T) (let* ([n1 (string->symbol (list-ref l 1))]
                      [n2 (string->symbol (list-ref l 2))]
