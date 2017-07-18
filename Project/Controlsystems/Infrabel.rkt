@@ -62,7 +62,8 @@
     (define direction 0)
     (if (eq? ((track 'get-node1)) node1)
         (set! direction +1)
-        (set! direction -1)))
+        (set! direction -1))
+		direction)
 
   (define (dispatch msg)
     (cond
