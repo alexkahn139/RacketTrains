@@ -6,3 +6,9 @@
 *.rkt~
 *.rkt#
 #*
+*.tex
+*.pdf
+*.graffle
+*.texpadtmp
+*.png
+Project/.DS_Store

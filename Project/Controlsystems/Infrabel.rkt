@@ -77,6 +77,5 @@
       (else (error "Unknown message"))
       ))
   (start-simulator)
-  (display "Ok. Locked and loaded")
   dispatch)
 (define infrabel (make-infrabel))

@@ -8,13 +8,13 @@
 (provide make-node)
 
 (define (make-node id x y)
-    (define (dispatch msg)
-        (cond
-            ; getters
-            ((eq? msg 'get-id) id)
-            ((eq? msg 'get-x) x)
-            ((eq? msg 'get-y) y)
+  (define (dispatch msg)
+    (cond
+      ; getters
+      ((eq? msg 'get-id) id)
+      ((eq? msg 'get-x) x)
+      ((eq? msg 'get-y) y)
 
-            (else
-                (error "Message not understood"))))
-    dispatch)
+      (else
+       (error "Message not understood"))))
+  dispatch)
