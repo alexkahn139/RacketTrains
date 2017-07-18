@@ -31,6 +31,7 @@
                 trains))
     (look-up (rwm-ls railwaymodel))
     light)
+
   (define (get-next-detection-track train)
     (define first-node '())
     (define second-node '())
@@ -40,7 +41,7 @@
         (begin
           (set! first-node (car schedule))
           (set! second-node (cadr schedule))
-          (set! detection-track (is-detection-track? first-node second-node))
+          (set! detection-track (get-dt first-node second-node))
           (if (detection-track)
               (begin ((detection-track 'get-id)) ((train 'set-schedule) (cddr schedule)))
               (begin ((train 'set-schedule) cdr schedule) (get-next-detection-track train)

@@ -13,13 +13,11 @@
 
 (provide (struct-out rwm)
          load-rwm
-         ;fetch-track
-         ;find-track
-         ;find-dt
-         ;find-nodes-middle
          get-track
          track-eqv?
          get-dt
+				 get-switch
+				 find-nodes-middle
          )
 
 (struct rwm (ls ns ss ts dt))
