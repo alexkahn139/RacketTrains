@@ -18,6 +18,7 @@
          get-dt
          get-switch
          find-nodes-middle
+				 find-railwaypiece
          )
 
 (struct rwm (ls ns ss ts dt))
@@ -75,10 +76,20 @@
 
 
 (define (get-track node1 node2)
-  (findf (lambda (track)
+  (define track (findf (lambda (t)
            (define testtrack (make-track node1 node2))
            (track-eqv? track testtrack))
          (rwm-ts)))
+	track)
+(define (find-railwaypiece node1 node2) ; You don't know if you need a switch, detection-block or track
+	(define track '())
+	(cond
+		((get-dt node1 node2) (set! track (get-dt node1 node2)))
+		((get-switch node1 node2) (set! track (get-switch node1 node2)))
+		(else
+			(set! track (get-track node1 node2))))
+	track)
+
 
 (define (get-dt node1 node2)
   (define detectiontrack #f)
@@ -87,8 +98,8 @@
                    (define t1 (make-track node1 node2))
                    (define t2 (make-track (dt 'get-node1) (dt 'get-node2)))
                    (when (track-eqv? t1 t2)
-                     (set! detectiontrack (id dt))))
-                 detectiontrack))
+                     (set! detectiontrack (id dt)))))
+                 detectiontrack)
 
 (define (get-switch rwm node1 node2)
   (define switch #f)
@@ -98,8 +109,8 @@
                    (define t2 (make-track (s 'get-node1) (s 'get-node2)))
                    (define t3 (make-track (s 'get-node1) (s 'get-node2)))
                    (when (or (track-eqv? t1 t2) (track-eqv? t1 t3))
-                     (set! switch (id s))))
-                 switch))
+                     (set! switch (id s)))))
+                 switch)
 (define (find-nodes-middle node1 node2)
   (define x1 (node1 'get-x))
   (define y1 (node1 'get-y))

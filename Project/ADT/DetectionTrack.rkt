@@ -10,7 +10,7 @@
 (provide make-dt)
 
 (define (make-dt id node1 node2 [max-speed 10])
-  (define type 'track)
+  (define type 'detection-track)
   (define occupied #f)
 
   (define (occupy! train-id)

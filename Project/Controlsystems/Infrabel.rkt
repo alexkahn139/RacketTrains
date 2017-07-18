@@ -7,6 +7,7 @@
 
 (require "../ADT/RailwayModel.rkt")
 (require "../Simulator/interface.rkt")
+(require "../Abstractions.rkt")
 
 (define (make-infrabel)
   (define railwaymodel (load-rwm "../ADT/be_simple.txt"))
@@ -48,6 +49,7 @@
                      ))
           detection-track)
         #f))
+
   (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
     (define id (switch 'get-id))
     (if (eq? (switch 'get-node1) nA)
@@ -57,13 +59,41 @@
         (if (eq? (switch 'get-node2) nA)
             (set-switch-state! id 1)
             (set-switch-state! id 2))))
+
   (define (calculate-direction node1 node2)
     (define track (get-track node1 node2))
     (define direction 0)
     (if (eq? ((track 'get-node1)) node1)
         (set! direction +1)
         (set! direction -1))
-		direction)
+    direction)
+
+  (define (calculate-train-movement train) ;Makes the train move, and the switches be set correctly
+    (define train-id (train 'get-id))
+    (define schedule (train 'get-schedule))
+    (define location (get-loco-detection-block train-id))
+    (define current (current-node schedule))
+    (define next (next-node schedule))
+    (define nextnext (next-node (next-node schedule)))
+    (define max-speed ((find-railwaypiece current next) 'get-max-speed))
+    (define track (find-railwaypiece current next))
+
+    (define (move)
+      (define (switch-setter) ; Switchen moeten op tijd klaar gezet worden
+        (when (eq? 'switch (track 'get-type))
+          (calculate-switch track next nextnext)))
+
+      (define (next-max-speed schedule)  ; The speed has to be calculated
+        (define next-track (find-railwaypiece (next-node schedule) (next-node (cdr schedule))))
+        (cond
+          ((null? schedule) max-speed) ; Train can stop here
+          ((eq? 'detection-track (next-track 'get-type)) (set! max-speed (min max-speed (next-track 'get-max-speed)))) ; If on dt, it should not go further until you know the lights of the next
+          (next-track (set! max-speed (min max-speed (next-track 'get-max-speed))) (next-max-speed (cdr schedule))) ; If on normal track, it can go further
+          ))
+      (switch-setter)
+      (next-max-speed))
+    (move))
+		
 
   (define (dispatch msg)
     (cond
