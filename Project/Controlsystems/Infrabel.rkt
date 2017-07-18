@@ -21,7 +21,8 @@
     (get-switch-position id))
   (define (set-switch-state! id new-pos)
     (set-switch-position! id new-pos))
-  (define (get-light track-id)
+  (define (get-light track)
+    (define track-id (track 'get-id))
     (define light 'green)
     (define (look-up trains)
       (for-each (lambda (train)
@@ -92,8 +93,11 @@
           ))
       (switch-setter)
       (next-max-speed))
-    (move))
-		
+    (cond
+      ((>= 2 (length schedule)) 0) ; train should come to a stop
+      ((eq? 'red (get-next-detection-track train)) 0)
+      (else (* (calculate-direction current next) (min (train 'get-max-speed) (move))))))
+
 
   (define (dispatch msg)
     (cond
