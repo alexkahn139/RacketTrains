@@ -11,7 +11,7 @@
 
 (provide make-nmbs)
 
-(define (make-nmbs)
+(define (make-nmbs infrabel)
 
   (define (print-status)
     (hash-for-each (rwm-dt rwm)
@@ -30,6 +30,12 @@
        (display (track 'free?))
        (newline))
      (rwm-ts)))
+
+  (define (schedule-destination! train-id destination) ; Need the ID of the train and the destination
+    (define train (find-train train-id))
+    (define location (infrabel 'get-locomotive-location train-id))
+    (define path 'a) ; Met de grafalgorithmen hier de korste weg berekenen
+    ((train 'set-schedule!) path))
 
 
   (define (dispatch msg)

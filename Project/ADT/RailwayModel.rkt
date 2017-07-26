@@ -19,6 +19,7 @@
          get-switch
          find-nodes-middle
 				 find-railwaypiece
+         find-train
          )
 
 (struct rwm (ls ns ss ts dt))
@@ -117,3 +118,6 @@
   (define x2 (node2 'get-x))
   (define y2 (node2 'get-y))
   (cons (/ (+ x1 x2) 2) (/ (+ y1 y2) 2)))
+
+(define (find-train train-id)
+  (hash-ref (rwm-ls rwm) train-id))
