@@ -9,6 +9,8 @@
 (require "../Simulator/interface.rkt")
 (require "../Abstractions.rkt")
 
+(provide make-infrabel)
+
 (define (make-infrabel)
   (define railwaymodel (load-rwm "../ADT/be_simple.txt"))
   ;; Speed of the train
