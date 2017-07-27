@@ -13,16 +13,25 @@
 
 (define (make-infrabel)
   (define railwaymodel (load-rwm "../ADT/be_simple.txt"))
+
   ;; Speed of the train
   (define (get-locomotive-speed id)
     (get-loco-speed id))
+
   ;; Location of the train, if it is on a detection-block
   (define (get-locomotive-location id)
     (get-loco-detection-block id))
+
   (define (get-switch-state id)
     (get-switch-position id))
+
   (define (set-switch-state! id new-pos)
     (set-switch-position! id new-pos))
+
+  (define (update)
+    (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
+                       (drive-train train))))
+
   (define (get-light track)
     (define track-id (track 'get-id))
     (define light 'green)
@@ -35,6 +44,12 @@
                 trains))
     (look-up (rwm-ls railwaymodel))
     light)
+
+  (define (drive-train train)
+    (define schedule (train 'get-schedule))
+    (if (null? schedule)
+        (set-loco-speed! (train 'get-id) 0)
+        (set-loco-speed! (train 'get-id) (calculate-train-movement train))))
 
   (define (get-next-detection-track train)
     (define first-node '())
@@ -103,6 +118,7 @@
 
   (define (dispatch msg)
     (cond
+      ((eq? msg 'update) update)
       ; Getters
       ((eq? msg 'get-locomotive-speed) get-locomotive-speed)
       ((eq? msg 'get-locomotive-location) get-locomotive-location)
