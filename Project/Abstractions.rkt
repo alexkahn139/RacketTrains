@@ -8,8 +8,11 @@
 (provide
 	current-node
 	next-node
+	rest-nodes
 	)
 
 (define current-node car)
 
 (define next-node cadr)
+
+(define rest-nodes cdr)

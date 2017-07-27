@@ -48,19 +48,16 @@
                      [n0 (string->symbol (list-ref l 2))]
                      [n1 (string->symbol (list-ref l 3))]
                      [n2 (string->symbol (list-ref l 4))]
-                     [ms (string->symbol (list-ref l 5))]
                      [res (make-switch nm n0 n1 n2)])
                 (hash-set! ss nm res))]
          [(T) (let* ([n1 (string->symbol (list-ref l 1))]
                      [n2 (string->symbol (list-ref l 2))]
-                     [ms (string->symbol (list-ref l 3))]
-                     [res (make-track n1 n2 ms)])
+                     [res (make-track n1 n2)])
                 (set! ts (cons res ts)))]
          [(D) (let* ([id (string->symbol (list-ref l 1))]
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
-                     [ms (string->symbol (list-ref l 4))]
-                     [res (make-dt id n1 n2 ms)])
+                     [res (make-dt id n1 n2)])
                 (hash-set! ds id res))]))
      lines)
     (rwm ls ns ss ts ds)))

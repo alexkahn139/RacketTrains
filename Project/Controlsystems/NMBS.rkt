@@ -12,6 +12,7 @@
 (provide make-nmbs)
 
 (define (make-nmbs infrabel)
+  (define rwm (load-rwm "be_simple.txt"))
 
   (define (print-status)
     (hash-for-each (rwm-dt rwm)
@@ -31,6 +32,13 @@
        (newline))
      (rwm-ts)))
 
+  ; Ik snap niet helemaal wat hier het doel is van nmbs
+  ;(define (pre-process train) ; Plan a trainride via free tracks, so the scheduling get's less problems
+  ;  (define schedule (train 'schedule))
+  ;  (define (occupy-next-parts sched) ; This way a train get's priority over the tracks
+  ;    (when (< 1 (rest-nodes sched)))
+  ;      ))
+
   (define (schedule-destination! train-id destination) ; Need the ID of the train and the destination
     (define train (find-train train-id))
     (define location (infrabel 'get-locomotive-location train-id))
@@ -41,5 +49,6 @@
   (define (dispatch msg)
     (cond
       ((eq? msg 'print-status) print-status)
+      ((eq? msg 'schedule-destination!) schedule-destination!)
       (else (error "Unkown Message"))))
   dispatch)

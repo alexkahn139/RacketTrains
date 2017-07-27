@@ -171,7 +171,7 @@
            ; add detection-blocks
            (for-each (lambda (d)
                        (let ([t (detection-block-track d)])
-                         (when (or (eqv? (track-n1 t) n2) 
+                         (when (or (eqv? (track-n1 t) n2)
                                    (eqv? (track-n2 t) n2))
                            (set! tracks (cons t tracks)))))
                      (rwm-ds model))
