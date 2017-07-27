@@ -53,6 +53,6 @@
     (super-new)))
  
 ; Make a canvas that handles events in the frame
-(new my-canvas% [parent draw-panel])
-
+(define canvas (new my-canvas% [parent draw-panel]))
+(define draw (send canvas get-dc))
 (send train-frame show #t)
