@@ -68,7 +68,8 @@
     dt-list)
 
 ; Draw functions
-(define (draw-nodes nodes)
+(define (draw-nodes)
+  (define nodes (get-nodes))
   (for-each (lambda (node)
               (define x (scale (x-nodelist node)))
               (define y (scale (y-nodelist node)))
@@ -89,6 +90,8 @@
               (set-color! "black")
               (send dc draw-line x1t y1t x2t y2t))
     tracks))
+
+;(define (draw-dt)
 
 
 ; Make a static text message in the frame
