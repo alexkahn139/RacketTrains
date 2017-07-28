@@ -10,7 +10,7 @@
 (provide (struct-out position)
          (struct-out loco)
          mk-loco
-         
+
          (struct-out node)
          (struct-out switch)
          (struct-out track)
@@ -66,7 +66,7 @@
     (for-each
      (lambda (l)
        (case (string->symbol (car l))
-         [(L) (let* ([lid (string->symbol (list-ref l 1))]
+         [(L) (let* ([lid (string->number (list-ref l 1))]
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [res (mk-loco lid n1 n2)])
@@ -114,6 +114,3 @@
   (if d
       (detection-block-id d)
       #f))
-
-
-

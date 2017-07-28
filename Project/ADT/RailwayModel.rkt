@@ -34,7 +34,7 @@
     (for-each
      (lambda (l)
        (case (string->symbol (car l))
-         [(L) (let* ([id (string->symbol (list-ref l 1))]
+         [(L) (let* ([id (string->number (list-ref l 1))]
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [res (make-train id)])

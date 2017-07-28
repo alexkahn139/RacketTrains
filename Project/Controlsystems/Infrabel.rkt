@@ -34,15 +34,15 @@
 
   (define (get-light track)
     (define track-id (track 'get-id))
-    (define light 'green)
-    (define (look-up trains)
-      (for-each (lambda (train)
-                  (define id (train 'get-id))
+    (define light #f)
+    (hash-for-each
+      (rwm-ls railwaymodel)
+      (lambda (id loco)
+        (define id (loco 'get-id))
                   (if (eq? (get-locomotive-location id) track-id)
-                      (set! light 'red)
+                      (set! light #t)
                       'ok))
-                trains))
-    (look-up (rwm-ls railwaymodel))
+              )
     light)
 
   (define (drive-train train)

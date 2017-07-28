@@ -67,7 +67,7 @@
           (x2 (node2 'get-x))
           (y2 (node2 'get-y))
           (id (dt 'get-id))
-          (occupied? (dt 'occupied?)))
+          (occupied? ((infrabel 'get-light) dt)))
        (set! dt-list (cons (list x1 y1 x2 y2 (symbol->string id) occupied?) dt-list)))))
   dt-list)
 
