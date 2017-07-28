@@ -7,6 +7,7 @@
 
 (require "../Project/Controlsystems/Infrabel.rkt")
 (require "../Project/Controlsystems/NMBS.rkt")
+(require "../Project/GUI/GUI.rkt")
 
 (define (make-main)
   (define infrabel (make-infrabel))
@@ -15,6 +16,7 @@
 
   (define (prog-loop)
     ((infrabel 'update))
+    (draw-all infrabel)
     (sleep 0.1)
     (when loop
       (prog-loop)))

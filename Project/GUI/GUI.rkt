@@ -8,13 +8,17 @@
 (require "../Controlsystems/Infrabel.rkt")
 
 (require racket/gui/base)
-(define railwaymodel (load-rwm "../be_simple.txt"))
 
-(define infrabel (make-infrabel))
+(provide
+ draw-all)
+
+(define railwaymodel (load-rwm "be_simple.txt"))
+
+;(define infrabel (make-infrabel))
 
 (define size 800)
 ; Load all the bitmaps
-(define locomotive  (read-bitmap "loco.jpeg"))
+(define locomotive  (read-bitmap "GUI/loco.jpeg"))
 (define (set-color! color)
   (send dc set-pen (send the-pen-list find-or-create-pen color 4 'solid 'round)))
 ; Make a frame by instantiating the frame% class
@@ -54,7 +58,7 @@
    (rwm-ts railwaymodel))
   track-list)
 
-(define (get-dt)
+(define (get-dt infrabel)
   (define dt-list '())
   (hash-for-each
    (rwm-dt railwaymodel)
@@ -131,8 +135,8 @@
               (send dc draw-line x1 y1 x2 y2))
             tracks))
 
-(define (draw-dt)
-  (define dts (get-dt))
+(define (draw-dt infrabel)
+  (define dts (get-dt infrabel))
   (for-each (lambda (dt)
               (define x1 (scale (x1t dt)))
               (define x2 (scale (x2t dt)))
@@ -166,7 +170,7 @@
               (send dc draw-line x3 y3 xid yid)
               )
             switches))
-(define (draw-locos)
+(define (draw-locos infrabel)
   (define locos (get-locomotives infrabel))
   (for-each (lambda (loco)
               (define id (car loco))
@@ -181,13 +185,13 @@
               (when (not (cadr loco))
                 (send msg set-label "Not all locs on dt")))
             locos))
-(define (draw-all)
+(define (draw-all infrabel)
+  (send dc clear) 
   (draw-switches)
-  (draw-dt)
+  (draw-dt infrabel)
   (draw-tracks)
   (draw-nodes)
-  (draw-locos)
-  ;(send dc draw-bitmap locomotive 20 20)
+  (draw-locos infrabel)
   )
 ; Make a static text message in the frame
 (define msg (new message% [parent train-frame]
