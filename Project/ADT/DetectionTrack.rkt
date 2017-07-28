@@ -26,9 +26,10 @@
       ((eq? msg 'get-node2) node2)
       ((eq? msg 'occupied?) occupied)
       ((eq? msg 'get-max-speed) max-speed)
+      ((eq? msg 'get-id) id)
       ; setters
       ((eq? msg 'free!) free!)
       ((eq? msg 'occupy!) occupy!)
       (else
-       (error "Message not understood"))))
+       (error "Message not understood " msg))))
   dispatch)

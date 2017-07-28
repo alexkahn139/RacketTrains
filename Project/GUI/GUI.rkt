@@ -34,12 +34,38 @@
           (id (node 'get-id)))
        (set! node-list (cons (list x y (symbol->string id)) node-list)))))
   node-list) ; return the nodes
-;(define (get-tracks)
-;  (define track-list '())
-;  (hash-for-each
-;   (rwm-ts railwaymodel)
-;   (lambda (id tracks)
-;     (let*
+
+(define (get-tracks)
+  (define track-list '())
+  (for-each
+   (lambda (track)
+     (let*
+       ((node1 (hash-ref (rwm-ns railwaymodel) (track 'get-node1)))
+        (node2 (hash-ref (rwm-ns railwaymodel) (track 'get-node2)))
+        (x1 (node1 'get-x))
+        (y1 (node1 'get-y))
+        (x2 (node2 'get-x))
+        (y2 (node2 'get-y)))
+     (set! track-list (cons (list x1 y1 x2 y2) track-list))))
+   (rwm-ts railwaymodel))
+  track-list)
+
+  (define (get-dt)
+    (define dt-list '())
+    (hash-for-each
+     (rwm-dt railwaymodel)
+     (lambda (id dt)
+       (let*
+         ((node1 (hash-ref (rwm-ns railwaymodel) (dt 'get-node1)))
+          (node2 (hash-ref (rwm-ns railwaymodel) (dt 'get-node2)))
+          (x1 (node1 'get-x))
+          (y1 (node1 'get-y))
+          (x2 (node2 'get-x))
+          (y2 (node2 'get-y))
+          (id (dt 'get-id))
+          (occupied? (dt 'occupied?)))
+       (set! dt-list (cons (list x1 y1 x2 y2 (symbol->string id) occupied?) dt-list)))))
+    dt-list)
 
 ; Draw functions
 (define (draw-nodes nodes)
@@ -52,6 +78,17 @@
               (set-color! "orange")
               (send dc draw-ellipse x y 4 4)); Elke node moet hier getekend worden
             nodes))
+
+(define (draw-tracks)
+  (define tracks (get-tracks))
+  (for-each (lambda (track)
+              (define x1t (scale (x1 track)))
+              (define x2t (scale (x2 track)))
+              (define y1t (scale (y1 track)))
+              (define y2t (scale (y2 track)))
+              (set-color! "black")
+              (send dc draw-line x1t y1t x2t y2t))
+    tracks))
 
 
 ; Make a static text message in the frame
@@ -98,3 +135,4 @@
 
 (send train-frame show #t)
 ; Draw all the things
+(get-dt)

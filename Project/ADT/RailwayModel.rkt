@@ -30,7 +30,7 @@
         [ns (make-hash)]
         [ss (make-hash)]
         [ts '()]
-        [ds (make-hash)])
+        [dt (make-hash)])
     (for-each
      (lambda (l)
        (case (string->symbol (car l))
@@ -58,9 +58,9 @@
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [res (make-dt id n1 n2)])
-                (hash-set! ds id res))]))
+                (hash-set! dt id res))]))
      lines)
-    (rwm ls ns ss ts ds)))
+    (rwm ls ns ss ts dt)))
 
 (define (track-eqv? t1 t2)
   (or (and (eqv? (t1 'get-node1)

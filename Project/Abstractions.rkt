@@ -12,6 +12,11 @@
 	x-nodelist
 	y-nodelist
 	id-nodelist
+	x1
+	x2
+	y1
+	y2
+	id-dt
 	)
 
 (define current-node car)
@@ -25,3 +30,14 @@
 (define y-nodelist cadr)
 
 (define id-nodelist caddr)
+
+(define x1 car)
+
+(define x2 caddr)
+
+(define y1 cadr)
+
+(define y2 cadddr)
+
+(define (id-dt dt)
+	(cadddr (cdr dt)))
