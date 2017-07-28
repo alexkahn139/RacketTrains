@@ -12,10 +12,10 @@
 	x-nodelist
 	y-nodelist
 	id-nodelist
-	x1
-	x2
-	y1
-	y2
+	x1t
+	x2t
+	y1t
+	y2t
 	id-dt
 	)
 
@@ -31,13 +31,13 @@
 
 (define id-nodelist caddr)
 
-(define x1 car)
+(define x1t car)
 
-(define x2 caddr)
+(define x2t caddr)
 
-(define y1 cadr)
+(define y1t cadr)
 
-(define y2 cadddr)
+(define y2t cadddr)
 
 (define (id-dt dt)
 	(cadddr (cdr dt)))

@@ -44,12 +44,12 @@
                      [y (string->number (list-ref l 3))]
                      [res (make-node id x y)])
                 (hash-set! ns id res))]
-         [(S) (let* ([nm (string->symbol (list-ref l 1))]
+         [(S) (let* ([id (string->symbol (list-ref l 1))]
                      [n0 (string->symbol (list-ref l 2))]
                      [n1 (string->symbol (list-ref l 3))]
                      [n2 (string->symbol (list-ref l 4))]
-                     [res (make-switch nm n0 n1 n2)])
-                (hash-set! ss nm res))]
+                     [res (make-switch id n0 n1 n2)])
+                (hash-set! ss id res))]
          [(T) (let* ([n1 (string->symbol (list-ref l 1))]
                      [n2 (string->symbol (list-ref l 2))]
                      [res (make-track n1 n2)])
