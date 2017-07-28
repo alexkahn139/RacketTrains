@@ -4,6 +4,7 @@
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require "../ADT/RailwayModel.rkt")
+(require "../Abstractions.rkt")
 
 (require racket/gui/base)
 (define railwaymodel (load-rwm "../be_simple.txt"))
@@ -26,7 +27,7 @@
          ((x (node 'get-x))
           (y (node 'get-y))
           (id (node 'get-id)))
-       (set! node-list (cons (list x y id) node-list)))))
+       (set! node-list (cons (list x y (symbol->string id)) node-list)))))
   node-list) ; return the nodes
 ;(define (get-tracks)
 ;  (define track-list '())
@@ -35,7 +36,16 @@
 ;   (lambda (id tracks)
 ;     (let*
 
-
+; Draw functions
+(define (draw-nodes nodes)
+  (for-each (lambda (node)
+              (define x (x-nodelist node))
+              (define y (y-nodelist node))
+              (define id (id-nodelist node))
+              (send dc set-text-foreground "orange")
+              (send dc draw-text id x y)); Elke node moet hier getekend worden
+              nodes))
+  
 
 ; Make a static text message in the frame
 (define msg (new message% [parent train-frame]
@@ -77,8 +87,6 @@
 ; Make a canvas that handles events in the frame
 (define canvas (new my-canvas% [parent draw-panel]))
 (define dc (send canvas get-dc))
-(send dc set-pen
-      (send the-pen-list find-or-create-pen
-            "black" 20 'solid 'round))
+
 
 (send train-frame show #t)
