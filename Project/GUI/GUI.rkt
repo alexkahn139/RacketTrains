@@ -8,15 +8,20 @@
 
 (require racket/gui/base)
 (define railwaymodel (load-rwm "../be_simple.txt"))
+(define size 800)
 ; Load all the bitmaps
-
 (define locomotive  (read-bitmap "loco.bmp"))
+(define (set-color! color)
+  (send dc set-pen (send the-pen-list find-or-create-pen color 4 'solid 'round)))
 ; Make a frame by instantiating the frame% class
 (define train-frame (new frame%
                          [label "Racket Trains"]
                          [style '(no-resize-border)]
-                         [width 800]
-                         [height 600]))
+                         [width size]
+                         [height size]))
+(define (scale coordinate)
+  (/ (* coordinate size) 1000))
+
 ; Get all the things that should be drawn (Locomotives, nodes, tracks switches)
 (define (get-nodes)
   (define node-list '())
@@ -39,13 +44,15 @@
 ; Draw functions
 (define (draw-nodes nodes)
   (for-each (lambda (node)
-              (define x (x-nodelist node))
-              (define y (y-nodelist node))
+              (define x (scale (x-nodelist node)))
+              (define y (scale (y-nodelist node)))
               (define id (id-nodelist node))
               (send dc set-text-foreground "orange")
-              (send dc draw-text id x y)); Elke node moet hier getekend worden
-              nodes))
-  
+              (send dc draw-text id (+ 4 x) (+ y 1))
+              (set-color! "orange")
+              (send dc draw-ellipse x y 4 4)); Elke node moet hier getekend worden
+            nodes))
+
 
 ; Make a static text message in the frame
 (define msg (new message% [parent train-frame]
@@ -90,3 +97,4 @@
 
 
 (send train-frame show #t)
+; Draw all the things
