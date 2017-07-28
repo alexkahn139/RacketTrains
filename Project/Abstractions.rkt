@@ -21,6 +21,7 @@
 	id-dt
 	xID
 	yID
+	sID
 	)
 
 (define current-node car)
@@ -54,3 +55,6 @@
 
 (define (id-dt dt)
 	(cadddr (cdr dt)))
+
+	(define (sID switch)
+		(cadddr (cddddr (cdr switch))))

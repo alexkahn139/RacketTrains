@@ -5,12 +5,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require "../ADT/RailwayModel.rkt")
 (require "../Abstractions.rkt")
+(require "../Controlsystems/Infrabel.rkt")
 
 (require racket/gui/base)
 (define railwaymodel (load-rwm "../be_simple.txt"))
+
+(define infrabel (make-infrabel))
+
 (define size 800)
 ; Load all the bitmaps
-(define locomotive  (read-bitmap "loco.bmp"))
+(define locomotive  (read-bitmap "loco.jpeg"))
 (define (set-color! color)
   (send dc set-pen (send the-pen-list find-or-create-pen color 4 'solid 'round)))
 ; Make a frame by instantiating the frame% class
@@ -85,8 +89,23 @@
           (y3 (node3 'get-y))
           (idx (id 'get-x))
           (idy (id 'get-y)))
-       (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (switch 'get-id)) switch-list)))))
+       (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (symbol->string (switch 'get-id))) switch-list)))))
   switch-list)
+
+(define (get-locomotives infrabel)
+  (define loco-list '())
+  (hash-for-each
+   (rwm-ls railwaymodel)
+   (lambda (id loco)
+     (let*
+         ((idl (loco 'get-id))
+          (det-id ((infrabel 'get-locomotive-location) idl))
+          (dt #f)
+          )
+       (when det-id
+         (set! dt (hash-ref (rwm-dt railwaymodel) det-id)))
+       (set! loco-list (cons (list id dt) loco-list)))))
+  loco-list)
 
 ; Draw functions
 (define (draw-nodes)
@@ -119,6 +138,9 @@
               (define x2 (scale (x2t dt)))
               (define y1 (scale (y1t dt)))
               (define y2 (scale (y2t dt)))
+              (define id (id-dt dt))
+              (send dc set-text-foreground "black")
+              (send dc draw-text id (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
               (if (cadddr (cddr dt))
                   (set-color! "red")
                   (set-color! "green"))
@@ -136,13 +158,37 @@
               (define y3 (scale (y3t switch)))
               (define xid (scale (xID switch)))
               (define yid (scale (yID switch)))
+              (define sid (sID switch))
+              ; (send dc set-text-foreground "black") (send dc draw-text sid (+ 4 xid) (+ yid 4)) ; Is zelfde als de node
               (set-color! "black")
               (send dc draw-line x1 y1 xid yid)
               (send dc draw-line x2 y2 xid yid)
               (send dc draw-line x3 y3 xid yid)
               )
             switches))
-
+(define (draw-locos)
+  (define locos (get-locomotives infrabel))
+  (for-each (lambda (loco)
+              (define id (car loco))
+              (when (cadr loco)
+                (define node1 (hash-ref (rwm-ns railwaymodel) ((cadr loco) 'get-node1)))
+                (define node2 (hash-ref (rwm-ns railwaymodel) ((cadr loco) 'get-node2)))
+                (define x1 (scale (node1 'get-x)))
+                (define x2 (scale (node2 'get-x)))
+                (define y1 (scale (node1 'get-y)))
+                (define y2 (scale (node2 'get-y)))
+                (send dc draw-bitmap locomotive (/ (+ x1 x2) 2) (/ (+ y1 y2) 2)))
+              (when (not (cadr loco))
+                (send msg set-label "Not all locs on dt")))
+            locos))
+(define (draw-all)
+  (draw-switches)
+  (draw-dt)
+  (draw-tracks)
+  (draw-nodes)
+  (draw-locos)
+  ;(send dc draw-bitmap locomotive 20 20)
+  )
 ; Make a static text message in the frame
 (define msg (new message% [parent train-frame]
                  [label "No events so far..."]))
@@ -171,13 +217,13 @@
 ; Derive a new canvas (a drawing window) class to handle events
 (define my-canvas%
   (class canvas% ; The base class is canvas%
-    ; Define overriding method to handle mouse events
-    (define/override (on-event event)
-      (send msg set-label "Canvas mouse"))
-    ; Define overriding method to handle keyboard events
-    (define/override (on-char event)
-      (send msg set-label "Canvas keyboard"))
-    ; Call the superclass init, passing on all init args x1t y1t x2t y2t))
+    ;; Define overriding method to handle mouse events
+    ;(define/override (on-event event)
+    ;  (send msg set-label "Canvas mouse"))
+    ;; Define overriding method to handle keyboard events
+    ;(define/override (on-char event)
+    ;  (send msg set-label "Canvas keyboard"))
+    ;; Call the superclass init, passing on all init args x1t y1t x2t y2t))
     (super-new)))
 
 ; Make a canvas that handles events in the frame
