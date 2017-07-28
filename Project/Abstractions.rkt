@@ -16,7 +16,11 @@
 	x2t
 	y1t
 	y2t
+	x3t
+	y3t
 	id-dt
+	xID
+	yID
 	)
 
 (define current-node car)
@@ -35,9 +39,18 @@
 
 (define x2t caddr)
 
+(define (x3t switch)
+	(cadddr (cdr switch)))
+(define (xID switch)
+	(cadddr (cdddr switch)))
+
 (define y1t cadr)
 
 (define y2t cadddr)
+(define (yID switch)
+	(cadddr (cddddr switch)))
+(define (y3t switch)
+	(cadddr (cddr switch)))
 
 (define (id-dt dt)
 	(cadddr (cdr dt)))
