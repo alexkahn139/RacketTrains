@@ -47,6 +47,7 @@
 
   (define (drive-train train)
     (define schedule (train 'get-schedule))
+    (displayln "GO TRAIN GO")
     (if (null? schedule)
         (set-loco-speed! (train 'get-id) 0)
         (set-loco-speed! (train 'get-id) (calculate-train-movement train))))
