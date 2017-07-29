@@ -58,11 +58,9 @@
        (let*
            ((node1 (hash-ref node-dict (ss 'get-node1)))
             (node2 (hash-ref node-dict (ss 'get-node2)))
-            (node3 (hash-ref node-dict (ss 'get-node3)))
-            (id (hash-ref node-dict (ss 'get-id))))
-         (add-track! node1 id)
-         (add-track! node2 id)
-         (add-track! node3 id))))
+            (node3 (hash-ref node-dict (ss 'get-node3))))
+         (add-track! node1 node2)
+         (add-track! node1 node3))))
 
     (for-each
      (lambda (track)
@@ -76,7 +74,6 @@
   (define (dispatch msg)
     (cond
       ((eq? msg 'build-graph) build-graph)
-      
       (else (error "Unknown message"))
       ))
   dispatch)
