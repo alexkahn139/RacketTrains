@@ -15,7 +15,7 @@
 
 (define (make-rwm-to-graph)
   (define number-of-nodes (hash-count (rwm-ns railwaymodel)))
-  (define node-graph (graph:new #f number-of-nodes))
+  (define node-graph (new #f number-of-nodes))
 
   ; Each node should in the graph should be linked with a real node
   ;; Best done with dictionary
@@ -69,22 +69,26 @@
            ((node1 (hash-ref node-dict (track 'get-node1)))
             (node2 (hash-ref node-dict (track 'get-node2))))
          (add-track! node1 node2)))
-       (rwm-ts railwaymodel))
+     (rwm-ts railwaymodel))
     )
 
-	(define (calculate-path block-1 block-2)
-		(define start-node ((hash-ref (rwm-dt railwaymodel) block-1) 'get-node1))
-		(define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
-		(define start-vertex (hash-ref node-dict start-node))
-		(define stop-vertex (hash-ref node-dict stop-node))
-		(shortest-path node-graph start-vertex stop-vertex)
-		)
+  (define (calculate-path block-1 block-2)
+    (define (list-from-mcons mlist list)
+      (if (null? mlist)
+          (reverse list)
+          (list-from-mcons (mcdr mlist) (cons (mcar mlist) list))))
+    (define start-node ((hash-ref (rwm-dt railwaymodel) block-1) 'get-node1))
+    (define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
+    (define start-vertex (hash-ref node-dict start-node))
+    (define stop-vertex (hash-ref node-dict stop-node))
+    (list-from-mcons (shortest-path node-graph start-vertex stop-vertex) '())
+    )
 
 
   (define (dispatch msg)
     (cond
       ((eq? msg 'build-graph) build-graph)
-			((eq? msg 'calculate-path) calculate-path)
+      ((eq? msg 'calculate-path) calculate-path)
       (else (error "Unknown message"))
       ))
   dispatch)
