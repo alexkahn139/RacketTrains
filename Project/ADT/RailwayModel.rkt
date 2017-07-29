@@ -20,6 +20,7 @@
          find-nodes-middle
 				 find-railwaypiece
          find-train
+         railwaymodel
          )
 
 (struct rwm (ls ns ss ts dt))
@@ -118,3 +119,5 @@
 
 (define (find-train train-id)
   (hash-ref (rwm-ls rwm) train-id))
+
+(define railwaymodel (load-rwm "be_simple.txt"))

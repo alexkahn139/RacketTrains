@@ -1,8 +1,10 @@
 #lang racket/gui
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;              GUI ADT                 ;;
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (require "../ADT/RailwayModel.rkt")
 (require "../Abstractions.rkt")
 (require "../Controlsystems/Infrabel.rkt")
@@ -186,7 +188,7 @@
                 (send msg set-label "Not all locs on dt")))
             locos))
 (define (draw-all infrabel)
-  (send dc clear) 
+  (send dc clear)
   (draw-switches)
   (draw-dt infrabel)
   (draw-tracks)
