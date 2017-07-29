@@ -55,7 +55,7 @@
                      [n2 (string->symbol (list-ref l 2))]
                      [res (make-track n1 n2)])
                 (set! ts (cons res ts)))]
-         [(D) (let* ([id (string->symbol (list-ref l 1))]
+         [(D) (let* ([id (string->number (list-ref l 1))]
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [res (make-dt id n1 n2)])

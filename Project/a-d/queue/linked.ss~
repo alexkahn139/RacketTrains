@@ -1,0 +1,67 @@
+#lang r6rs
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*                 Queues (Linked Implementation)                  *-*-
+;-*-*                                                                 *-*-
+;-*-*                       Wolfgang De Meuter                        *-*-
+;-*-*                 2008 Programming Technology Lab                 *-*-
+;-*-*                   Vrije Universiteit Brussel                    *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(library
+ (queue)
+ (export new queue? serve! enqueue! peek full? empty?)
+ (import (rnrs base)
+         (rnrs mutable-pairs))
+ 
+ (define queue-tag 'linked-queue)
+ (define (make)
+   (list queue-tag '() '()))
+ (define (head q)
+   (cadr q))
+ (define (head! q node)
+   (set-car! (cdr q) node))
+ (define (rear q)
+   (caddr q))
+ (define (rear! q node)
+   (set-car! (cddr q) node))
+ 
+ (define (new)
+   (make))
+ 
+ (define (queue? any)
+   (and (pair? any)
+        (eq? (car any) queue-tag)))
+ 
+ (define (enqueue! q val)
+   (define last (rear q))
+   (define node (cons val '()))
+   (if (null? (head q))
+     (head! q node)
+     (set-cdr! last node))
+   (rear! q node)
+   q)
+ 
+ (define (peek q)
+   (if (null? (head q))
+     (error "empty queue (peek)" q)
+     (car (head q))))
+ 
+ (define (serve! q)
+   (define first (head q))
+   (if (null? first)
+     (error "empty queue (serve!)" q))
+   (head! q (cdr first))
+   (if (null? (head q))
+     (rear! q '()))
+   (car first))
+ 
+ (define (empty? q)
+   (null? (head q)))
+ 
+ (define (full? q)
+   #f))

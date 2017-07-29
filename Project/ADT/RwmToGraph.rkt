@@ -7,7 +7,8 @@
 
 (require "../ADT/RailwayModel.rkt")
 (require "../Abstractions.rkt")
-(require (prefix-in graph: "../a-d/graph/unweighted/config.rkt"))
+(require "../a-d/graph/unweighted/config.rkt")
+(require "../a-d/graph-algorithms/undirected/bft-applications.rkt")
 
 (provide make-rwm-to-graph)
 
@@ -43,7 +44,7 @@
 
   (define (build-graph)
     (define (add-track! node1 node2)
-      (graph:add-edge! node-graph node1 node2))
+      (add-edge! node-graph node1 node2))
     (link-nodes-to-graph)
     (hash-for-each
      (rwm-dt railwaymodel)
@@ -71,12 +72,23 @@
        (rwm-ts railwaymodel))
     )
 
+	(define (calculate-path block-1 block-2)
+		(define start-node ((hash-ref (rwm-dt railwaymodel) block-1) 'get-node1))
+		(define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
+		(define start-vertex (hash-ref node-dict start-node))
+		(define stop-vertex (hash-ref node-dict stop-node))
+		(shortest-path node-graph start-vertex stop-vertex)
+		)
+
+
   (define (dispatch msg)
     (cond
       ((eq? msg 'build-graph) build-graph)
+			((eq? msg 'calculate-path) calculate-path)
       (else (error "Unknown message"))
       ))
   dispatch)
 
-;(define gg (make-rwm-to-graph))
-;((gg 'build-graph))
+(define gg (make-rwm-to-graph))
+((gg 'build-graph))
+((gg 'calculate-path) 1 4)

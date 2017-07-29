@@ -1,0 +1,69 @@
+#lang r6rs
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*                     Queues (Circular Vector)                    *-*-
+;-*-*                                                                 *-*-
+;-*-*                       Wolfgang De Meuter                        *-*-
+;-*-*                 2008 Programming Technology Lab                 *-*-
+;-*-*                   Vrije Universiteit Brussel                    *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(library
+ (queue)
+ (export new queue? enqueue! serve! peek full? empty?)
+ (import (rnrs base)
+         (rnrs mutable-pairs))
+ 
+ (define queue-tag 'vector-queue)
+ (define default-size 5)
+ (define (make size)
+   (list queue-tag (make-vector size) 0 0)) ;tail head
+ (define (storage q)
+   (cadr q))
+ (define (head q)
+   (cadddr q))
+ (define (head! q head)
+   (set-car! (cdddr q) head))
+ (define (rear q)
+   (caddr q))
+ (define (rear! q rear)
+   (set-car! (cddr q) rear))
+ 
+ (define (new)
+   (make default-size))
+ 
+ (define (queue? any)
+   (and (pair? any)
+        (eq? (car any) queue-tag)))
+ 
+ (define (empty? q)
+   (= (head q)
+      (rear q)))
+ 
+ (define (full? q)
+   (= (mod (+ (rear q) 1) default-size)
+      (head q)))
+ 
+ (define (enqueue! q val)
+   (if (full? q)
+     (error "full queue (enqueue!)" q))
+   (let ((new-rear (mod (+ (rear q) 1) default-size)))
+     (vector-set! (storage q) (rear q) val)
+     (rear! q new-rear))
+   q)
+ 
+ (define (peek q)
+   (if (empty? q)
+     (error "empty queue (peek)" q))
+   (vector-ref (storage q) (head q)))
+ 
+ (define (serve! q)
+   (if (empty? q)
+     (error "empty queue (peek)" q))
+   (let ((result (vector-ref (storage q) (head q))))
+     (head! q (mod (+ (head q) 1) default-size))
+     result)))

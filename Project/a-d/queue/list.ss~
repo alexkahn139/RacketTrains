@@ -1,0 +1,59 @@
+#lang r6rs
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*           Queues (Slow Positional List Implementation)          *-*-
+;-*-*                                                                 *-*-
+;-*-*                       Wolfgang De Meuter                        *-*-
+;-*-*                 2008 Programming Technology Lab                 *-*-
+;-*-*                   Vrije Universiteit Brussel                    *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(library 
+ (queue)
+ (export new queue? enqueue! serve! peek full? empty?)
+ (import (prefix (a-d positional-list adt) plist:)
+         (except (rnrs base) length map for-each ))
+ 
+ (define queue-tag 'plist-queue)
+ (define (make)
+   (list queue-tag (plist:new eq?)))
+ (define (plist q)
+   (cadr q))
+ 
+ (define (new)
+   (make))
+ 
+ (define (queue? any)
+   (and (pair? any)
+        (eq? (car any) queue-tag)))
+ 
+ (define (enqueue! q val)
+   (define plst (plist q))
+   (if (full? q)
+     (error "full queue (enqueue!)" q)
+     (plist:add-before! plst val)))
+ 
+ (define (peek q)
+   (define plst (plist q))
+   (if (= (plist:length plst) 0)
+     (error "empty queue (peek)" q))
+   (plist:peek plst (plist:last plst)))
+ 
+ (define (serve! q)
+   (define plst (plist q))
+   (define last-position (plist:last plst))
+   (if (plist:empty? plst)
+     (error "queue empty (pop)" q))
+   (let ((val (plist:peek plst last-position)))
+     (plist:delete! plst last-position)
+     val))
+ 
+ (define (empty? q)
+   (plist:empty? (plist q)))
+ 
+ (define (full? q)
+   (plist:full? (plist q))))
