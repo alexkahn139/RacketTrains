@@ -6,16 +6,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require "../ADT/RailwayModel.rkt")
+(require "../ADT/RwmToGraph.rkt")
 (require "../Simulator/interface.rkt")
 (require "../Abstractions.rkt")
+
 
 (provide make-nmbs)
 
 (define (make-nmbs infrabel)
-  (define rwm (load-rwm "be_simple.txt"))
+
+  (define planner (make-rwm-to-graph))
 
   (define (print-status)
-    (hash-for-each (rwm-dt rwm)
+    (hash-for-each (rwm-dt railwaymodel)
                    (lambda (detection-track)
                      (display "Detection track: ")
                      (display (detection-track 'get-id))
@@ -41,8 +44,8 @@
 
   (define (schedule-destination! train-id destination) ; Need the ID of the train and the destination
     (define train (find-train train-id))
-    (define location (infrabel 'get-locomotive-location train-id))
-    (define path 'a) ; Met de grafalgorithmen hier de korste weg berekenen
+    (define location ((infrabel 'get-locomotive-location) train-id))
+    (define path ((planner 'calculate-path) location destination)) ; Met de grafalgorithmen hier de korste weg berekenen
     ((train 'set-schedule!) path))
 
 

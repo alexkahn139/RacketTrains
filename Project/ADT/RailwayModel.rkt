@@ -18,7 +18,7 @@
          get-dt
          get-switch
          find-nodes-middle
-				 find-railwaypiece
+         find-railwaypiece
          find-train
          railwaymodel
          )
@@ -55,7 +55,7 @@
                      [n2 (string->symbol (list-ref l 2))]
                      [res (make-track n1 n2)])
                 (set! ts (cons res ts)))]
-         [(D) (let* ([id (string->number (list-ref l 1))]
+         [(D) (let* ([id (string->symbol (list-ref l 1))]
                      [n1 (string->symbol (list-ref l 2))]
                      [n2 (string->symbol (list-ref l 3))]
                      [res (make-dt id n1 n2)])
@@ -76,40 +76,40 @@
 
 (define (get-track node1 node2)
   (define track (findf (lambda (t)
-           (define testtrack (make-track node1 node2))
-           (track-eqv? track testtrack))
-         (rwm-ts)))
-	track)
+                         (define testtrack (make-track node1 node2))
+                         (track-eqv? track testtrack))
+                       (rwm-ts)))
+  track)
 (define (find-railwaypiece node1 node2) ; You don't know if you need a switch, detection-block or track
-	(define track '())
-	(cond
-		((get-dt node1 node2) (set! track (get-dt node1 node2)))
-		((get-switch node1 node2) (set! track (get-switch node1 node2)))
-		(else
-			(set! track (get-track node1 node2))))
-	track)
+  (define track '())
+  (cond
+    ((get-dt node1 node2) (set! track (get-dt node1 node2)))
+    ((get-switch node1 node2) (set! track (get-switch node1 node2)))
+    (else
+     (set! track (get-track node1 node2))))
+  track)
 
 
 (define (get-dt node1 node2)
   (define detectiontrack #f)
-  (hash-for-each (rwm-dt rwm)
+  (hash-for-each (rwm-dt railwaymodel)
                  (lambda (id dt)
                    (define t1 (make-track node1 node2))
                    (define t2 (make-track (dt 'get-node1) (dt 'get-node2)))
                    (when (track-eqv? t1 t2)
                      (set! detectiontrack (id dt)))))
-                 detectiontrack)
+  detectiontrack)
 
 (define (get-switch rwm node1 node2)
   (define switch #f)
-  (hash-for-each (rwm-ss rwm)
+  (hash-for-each (rwm-ss railwaymodel)
                  (lambda (id s)
                    (define t1 (make-track node1 node2))
                    (define t2 (make-track (s 'get-node1) (s 'get-node2)))
                    (define t3 (make-track (s 'get-node1) (s 'get-node2)))
                    (when (or (track-eqv? t1 t2) (track-eqv? t1 t3))
                      (set! switch (id s)))))
-                 switch)
+  switch)
 (define (find-nodes-middle node1 node2)
   (define x1 (node1 'get-x))
   (define y1 (node1 'get-y))
@@ -118,6 +118,6 @@
   (cons (/ (+ x1 x2) 2) (/ (+ y1 y2) 2)))
 
 (define (find-train train-id)
-  (hash-ref (rwm-ls rwm) train-id))
+  (hash-ref (rwm-ls railwaymodel) train-id))
 
 (define railwaymodel (load-rwm "be_simple.txt"))

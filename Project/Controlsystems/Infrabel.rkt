@@ -12,7 +12,6 @@
 (provide make-infrabel)
 
 (define (make-infrabel)
-  (define railwaymodel (load-rwm "be_simple.txt"))
 
   ;; Speed of the train
   (define (get-locomotive-speed id)

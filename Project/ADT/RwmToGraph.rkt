@@ -83,7 +83,7 @@
     (define stop-vertex (hash-ref node-dict stop-node))
     (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex) '())))
  ; Calculates the path, changes it to a list en finally, returns the list with the number-of-nodes
- 
+
 	(build-graph)
   (define (dispatch msg)
     (cond
@@ -92,6 +92,3 @@
       (else (error "Unknown message"))
       ))
   dispatch)
-
-(define gg (make-rwm-to-graph))
-((gg 'calculate-path) 1 4)
