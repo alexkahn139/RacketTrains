@@ -13,12 +13,12 @@
   (define NMBS (make-nmbs infrabel))
   (define loop #t)
 
-  (define (prog-loop)
-    ;((infrabel 'update))
+  (define (main)
+    ((infrabel 'update))
     (draw-all infrabel)
     (sleep 0.02)
     (when loop
-      (prog-loop)))
+      (main)))
 
 (when loop
   (thread main))

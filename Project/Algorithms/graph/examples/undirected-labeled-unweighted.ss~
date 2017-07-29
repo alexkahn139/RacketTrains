@@ -1,0 +1,143 @@
+#lang r6rs
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*          Undirected Labeled Unweighted Graph example:           *-*-
+;-*-*                     Belgian highway network                     *-*-
+;-*-*                                                                 *-*-
+;-*-*                        Matthias Stevens                         *-*-
+;-*-*                 2008 Programming Technology Lab                 *-*-
+;-*-*                   Vrije Universiteit Brussel                    *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(library
+ (examples)
+ 
+ (export 
+  ;graph:
+  highways-belgium
+  ;cities (nodes):
+  Aalst Aarlen Antwerpen Bergen Boom Brugge Brussel Charleroi Diest Doornik Genk Gent Halle Hasselt Kortrijk La_Louviere Leuven Luik Maasmechelen Mechelen Namen Neufchateau Nijvel Oostende Sint-Niklaas Veurne Zeebrugge)
+ 
+ (import (rnrs base (6))
+         (a-d graph labeled config))
+ 
+ ;Variables for the cities (nodes):
+ (define Veurne        0)
+ (define Oostende      1)
+ (define Brugge        2)
+ (define Gent          3)
+ (define Kortrijk      4)
+ (define Zeebrugge     5) 
+ (define Antwerpen     6)
+ (define Hasselt       7)
+ (define Maasmechelen  8)
+ (define Sint-Niklaas  9)
+ (define Aalst        10)
+ (define Brussel      11)
+ (define Boom         12)
+ (define Mechelen     13)
+ (define Genk         14)
+ (define Diest        15)
+ (define Leuven       16)
+ (define Luik         17)
+ (define Namen        18)
+ (define Aarlen       19)
+ (define La_Louviere  20)
+ (define Doornik      21)
+ (define Bergen       22)
+ (define Nijvel       23)
+ (define Halle        24)
+ (define Charleroi    25)
+ (define Neufchateau  26)
+ 
+ ;The highway network represented by a labeled (unweighted) graph:
+ (define highways-belgium
+   (let ((g (new #f 27)))
+     
+     ;Cities (nodes):
+     (label! g 0  'Veurne)
+     (label! g 1  'Oostende)
+     (label! g 2  'Brugge)
+     (label! g 3  'Gent)
+     (label! g 4  'Kortrijk)
+     (label! g 5  'Zeebrugge) 
+     (label! g 6  'Antwerpen)
+     (label! g 7  'Hasselt)
+     (label! g 8  'Maasmechelen)
+     (label! g 9  'Sint-Niklaas)
+     (label! g 10 'Aalst)
+     (label! g 11 'Brussel)
+     (label! g 12 'Boom)
+     (label! g 13 'Mechelen)
+     (label! g 14 'Gent)
+     (label! g 15 'Diest)
+     (label! g 16 'Leuven)
+     (label! g 17 'Luik)
+     (label! g 18 'Namen)
+     (label! g 19 'Aarlen)
+     (label! g 20 'La_Louviere)
+     (label! g 21 'Doornik)
+     (label! g 22 'Bergen)
+     (label! g 23 'Nijvel)
+     (label! g 24 'Halle)
+     (label! g 25 'Charleroi)
+     (label! g 26 'Neufchateau)
+     
+     ;Highways (edges):
+     ;A12
+     (add-edge! g Brussel      Boom         'A12)
+     (add-edge! g Boom         Antwerpen    'A12)
+     ;E17
+     (add-edge! g Kortrijk     Gent         'E17)
+     (add-edge! g Gent         Sint-Niklaas 'E17)
+     (add-edge! g Sint-Niklaas Antwerpen    'E17)
+     ;E19
+     (add-edge! g Antwerpen    Mechelen     'E19)
+     (add-edge! g Mechelen     Brussel      'E19)
+     (add-edge! g Brussel      Halle        'E19)
+     (add-edge! g Halle        Nijvel       'E19)
+     (add-edge! g Nijvel       La_Louviere  'E19)
+     ;E19/E42
+     (add-edge! g La_Louviere  Bergen       'E19/E42)
+     ;E25
+     (add-edge! g Luik         Neufchateau  'E25)
+     ;E25/E411
+     (add-edge! g Neufchateau  Aarlen       'E25/E411)
+     ;E34
+     (add-edge! g Zeebrugge    Antwerpen    'E34)
+     ;E40
+     (add-edge! g Veurne       Brugge       'E40)
+     (add-edge! g Oostende     Brugge       'E40)
+     (add-edge! g Brugge       Gent         'E40)
+     (add-edge! g Gent         Aalst        'E40)
+     (add-edge! g Aalst        Brussel      'E40)
+     (add-edge! g Brussel      Leuven       'E40)
+     (add-edge! g Leuven       Luik         'E40)
+     ;E42
+     (add-edge! g Luik         Namen        'E42)
+     (add-edge! g Namen        Charleroi    'E42)
+     (add-edge! g Charleroi    La_Louviere  'E42)
+     ;E313
+     (add-edge! g Antwerpen    Hasselt      'E313)
+     (add-edge! g Hasselt      Luik         'E313)
+     ;E314
+     (add-edge! g Leuven       Diest        'E314)
+     (add-edge! g Diest        Genk         'E314)
+     (add-edge! g Genk         Maasmechelen 'E314)
+     ;E403
+     (add-edge! g Brugge       Kortrijk     'E403)
+     (add-edge! g Kortrijk     Doornik      'E403)
+     ;E411
+     (add-edge! g Brussel      Namen        'E411)
+     (add-edge! g Namen        Neufchateau  'E411)
+     ;E420
+     (add-edge! g Nijvel       Charleroi    'E420)
+     ;E429
+     (add-edge! g Doornik      Halle        'E429)
+     
+     ;Return the graph:
+     g)))

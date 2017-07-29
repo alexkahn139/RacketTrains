@@ -1,0 +1,121 @@
+#lang r6rs
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*         Weighted Graphs (Adjacency List Representation)         *-*-
+;-*-*                                                                 *-*-
+;-*-*                       Wolfgang De Meuter                        *-*-
+;-*-*                   2009  Software Languages Lab                  *-*-
+;-*-*                    Vrije Universiteit Brussel                   *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(library
+ (weighted-graph)
+ (export new weighted-graph? order directed? nr-of-edges 
+         for-each-node for-each-edge
+         add-edge! delete-edge!
+         adjacent? weight)
+ (import (rnrs base)
+         (srfi :9)
+         (rnrs mutable-pairs))
+ 
+ (define-record-type weighted-graph
+   (make d n s)
+   weighted-graph?
+   (d directed?)
+   (n nr-of-edges nr-of-edges!)
+   (s storage))
+
+ (define make-graph-edge cons)
+ (define graph-edge-weight car)
+ (define graph-edge-to cdr)
+ 
+ (define (new directed order)
+   (make directed 0 (make-vector order ())))
+
+ (define (order graph)
+   (vector-length (storage graph)))
+ 
+ (define (for-each-node graph proc)
+   (define lists (storage graph))
+   (let iter-nodes
+     ((node 0))
+     (proc node)
+     (if (< (+ node 1) (vector-length lists))
+       (iter-nodes (+ node 1))))
+   graph)
+ 
+ (define (for-each-edge graph from proc)
+   (define row (vector-ref (storage graph) from))
+   (let iter-edges
+     ((edges row))
+     (if (not (null? edges))
+       (let ((edge (car edges)))
+         (proc (graph-edge-weight edge) (graph-edge-to edge))
+         (iter-edges (cdr edges)))))
+   graph)
+ 
+ (define (add-edge! graph from to weight)
+   (define lists (storage graph))
+   (define edge (make-graph-edge weight to))
+   (define (insert-sorted edge prev next! next)
+     (cond 
+       ((or (null? next)
+            (> (graph-edge-to edge) (graph-edge-to (car next))))
+        (next! prev (cons edge next))
+        #t)
+       ((= (graph-edge-to edge) (graph-edge-to (car next)))
+        #f)
+       (else
+        (insert-sorted edge next set-cdr! (cdr next)))))
+   (define (head-setter head) 
+     (lambda (ignore next)
+       (vector-set! lists head next)))
+   (if (insert-sorted edge '() (head-setter from) (vector-ref lists from))
+     (nr-of-edges! graph (+ 1 (nr-of-edges graph))))
+   (if (not (directed? graph))
+     (let ((reverse (make-graph-edge weight from)))
+       (insert-sorted reverse '() (head-setter to) (vector-ref lists to))))
+   graph)
+ 
+ (define (delete-edge! graph from to)
+   (define lists (storage graph))
+   (define (delete-sorted to prev next! next)
+     (cond 
+       ((or (null? next)
+            (> to (graph-edge-to (car next))))
+        #f)
+       ((= to (graph-edge-to (car next)))
+        (next! prev (cdr next))
+        #t)
+       (else
+        (delete-sorted to next set-cdr! (cdr next)))))
+   (define (head-setter head) 
+     (lambda (ignore next)
+       (vector-set! lists head next)))
+   (if (delete-sorted to '() (head-setter from) (vector-ref lists from))
+     (nr-of-edges! graph (- (nr-of-edges graph) 1)))
+   (if (not (directed? graph))
+     (delete-sorted from '() (head-setter to) (vector-ref lists to)))
+   graph)
+ 
+ (define (adjacent? graph from to)
+   (not (eq? (weight graph from to) +inf.0)))
+ 
+ (define (weight graph from to)
+   (define lists (storage graph))
+   (if (= from to)
+     0
+     (let search-sorted
+       ((current (vector-ref lists from)))
+       (cond
+         ((or (null? current)
+              (< (graph-edge-to (car current)) to))
+          +inf.0)
+         ((= (graph-edge-to (car current)) to)
+          (graph-edge-weight (car current)))
+         (else
+          (search-sorted (cdr current))))))))

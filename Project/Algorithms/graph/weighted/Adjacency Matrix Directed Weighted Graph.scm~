@@ -1,0 +1,124 @@
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*        Weighted Graphs (Adjacency Matrix Representation)        *-*-
+;-*-*                                                                 *-*-
+;-*-*                       Wolfgang De Meuter                        *-*-
+;-*-*                 2007 Programming Technology Lab                 *-*-
+;-*-*                   Vrije Universiteit Brussel                    *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*                        Private Procedures                       *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(define @graph.tag 'graph)
+
+(define (@graph.make directed nr-of-nodes)
+  (list @graph.tag
+        directed
+        (let ((rows (make-vector nr-of-nodes)))
+          (let make-row
+            ((i 1)
+             (row (make-vector nr-of-nodes 'infinity)))
+            (vector-set! rows (- i 1) row)
+            (vector-set! row (- i 1) 0)
+            (if (< i nr-of-nodes)
+              (make-row (+ i 1) (make-vector nr-of-nodes 'infinity))
+              rows)))))
+
+(define (@graph.rows graph)
+  (caddr graph))
+
+(define (@graph.directed? graph)
+  (cadr graph))
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*                        Public Procedures                        *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(define (graph.new directed nr-of-nodes)
+  (@graph.make directed nr-of-nodes))
+
+(define (graph.graph? sobj)
+  (and (pair? sobj)
+       (eq? (car sobj) @graph.tag)))
+
+(define (graph.order graph)
+  (vector-length (@graph.rows graph)))
+
+(define (graph.directed? graph)
+  #t)
+
+(define (graph.map-nodes graph func)
+  (define rows (@graph.rows graph))
+  (let iter-nodes
+    ((i 0))
+    (func i)
+    (if (< (+ i 1) (vector-length rows))
+      (iter-nodes (+ i 1))))
+  graph)
+
+(define (graph.map-edges graph node func)
+  (define rows (@graph.rows graph))
+  (define row (vector-ref rows node))
+  (let iter-edges
+    ((to 0)
+     (weight (vector-ref row 0)))
+    (if (and (not (eq? weight 'infinity))
+             (not (= node to)))
+      (func weight to))
+    (if (< (+ to 1) (graph.order graph))
+      (iter-edges (+ to 1) (vector-ref row (+ to 1)))))
+  graph)
+
+(define (graph.add-edge! graph from to weight)
+  (define rows (@graph.rows graph))
+  (vector-set! (vector-ref rows from) to weight)
+  (if (not (@graph.directed? graph))
+    (vector-set! (vector-ref rows to) from weight))
+  graph)
+
+(define (graph.delete-edge! graph from to)
+  (define rows (@graph.rows graph))
+  (vector-set! (vector-ref rows from) to 'infinity)
+  (if (not (@graph.directed? graph))
+    (vector-set! (vector-ref rows to) from 'infinity))
+  graph)
+
+(define (graph.adjacent? graph from to)
+  (define rows (@graph.rows graph))
+  (define row (vector-ref rows from))
+  (not (eq? (vector-ref row to) 'infinity)))
+
+(define (graph.weight graph from to)
+  (define rows (@graph.rows graph))
+  (vector-ref (vector-ref rows from) to))
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+;-*-*                                                                 *-*-
+;-*-*                              Tests                              *-*-
+;-*-*                                                                 *-*-
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+(define directed #t)
+
+(define g (graph.new directed 8))
+(graph.add-edge! g 5 7 30)
+(graph.adjacent? g 5 7)
+(graph.adjacent? g 7 5)
+(graph.delete-edge! g 5 7)
+(graph.adjacent? g 5 7)
+(graph.adjacent? g 7 5)
+(graph.add-edge! g 1 4 50)
+(graph.add-edge! g 5 4 40)
+(graph.adjacent? g 1 4)
+(graph.adjacent? g 5 4)
+(graph.weight g 1 4)
+(graph.weight g 5 4)

@@ -222,11 +222,11 @@
 (define my-canvas%
   (class canvas% ; The base class is canvas%
     ;; Define overriding method to handle mouse events
-    (define/override (on-event event)
-      (send msg set-label "Canvas mouse"))
+    ;(define/override (on-event event)
+    ;  (send msg set-label "Canvas mouse"))
     ;; Define overriding method to handle keyboard events
-    (define/override (on-char event)
-      (send msg set-label "Canvas keyboard"))
+    ;(define/override (on-char event)
+    ;  (send msg set-label "Canvas keyboard"))
     ;; Call the superclass init, passing on all init args x1t y1t x2t y2t))
     (super-new)))
 
