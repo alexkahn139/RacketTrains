@@ -29,7 +29,7 @@
        (hash-set! node-dict id i)
        (set! i (+ 1 i)))))
 
-  (define (find-node graph-n)
+  (define (real-node graph-n)
     (define res #f)
     (hash-for-each
      node-dict
@@ -81,18 +81,17 @@
     (define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
     (define start-vertex (hash-ref node-dict start-node))
     (define stop-vertex (hash-ref node-dict stop-node))
-    (list-from-mcons (shortest-path node-graph start-vertex stop-vertex) '())
-    )
-
-
+    (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex) '())))
+ ; Calculates the path, changes it to a list en finally, returns the list with the number-of-nodes
+ 
+	(build-graph)
   (define (dispatch msg)
     (cond
-      ((eq? msg 'build-graph) build-graph)
+      ;((eq? msg 'build-graph) build-graph)
       ((eq? msg 'calculate-path) calculate-path)
       (else (error "Unknown message"))
       ))
   dispatch)
 
 (define gg (make-rwm-to-graph))
-((gg 'build-graph))
 ((gg 'calculate-path) 1 4)
