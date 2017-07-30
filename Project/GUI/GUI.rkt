@@ -15,7 +15,8 @@
  draw-all)
 
 (define railwaymodel (load-rwm "be_simple.txt"))
-
+(define infra '())
+(define train-list '())
 ;(define infrabel (make-infrabel))
 
 (define size 800)
@@ -188,6 +189,7 @@
                 (send msg set-label "Not all locs on dt")))
             locos))
 (define (draw-all infrabel)
+  (set! infra infrabel)
   (send dc clear)
   (draw-switches)
   (draw-dt infrabel)
@@ -205,12 +207,21 @@
 
 (define btn-panel (new horizontal-panel% [parent train-frame]
                        [min-height 40] [stretchable-height #f]))
+(define (train-field-list)
+  (define loco-list '())
+  (hash-for-each
+   (rwm-ls railwaymodel)
+   (lambda (id loco)
+     (set! loco-list (cons (string-append "Train " (number->string (loco 'get-id))) loco-list))))
+  loco-list)
+(define choice-list (train-field-list))
+(define trains-field (new combo-field%
 
-(define combo-field (new combo-field%
-                         (label "Train")
-                         (parent btn-panel)
-                         (choices (list "Field" "Train"))
-                         (init-value "Field")))
+                          (label "Choose train")
+                          (parent btn-panel)
+                          (choices choice-list)
+                          (init-value (car choice-list))
+                          ))
 
 
 (new button% [parent btn-panel]
