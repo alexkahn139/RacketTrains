@@ -48,21 +48,25 @@
     (define schedule (train 'get-schedule))
     (if (null? schedule)
         (set-loco-speed! (train 'get-id) 0)
-        (set-loco-speed! (train 'get-id) (calculate-train-movement train))))
+        (begin display (calculate-train-movement train)
+        (set-loco-speed! (train 'get-id) (calculate-train-movement train)))
+        )
+    (displayln "Let's move bitches. ChooChoo")
+    )
 
   (define (get-next-detection-track train)
     (define first-node '())
     (define second-node '())
     (define detection-track '())
-    (define schedule ((train 'get-schedule))) ;; Schedule exists of the Required Nodes
+    (define schedule (train 'get-schedule)) ;; Schedule exists of the Required Nodes
     (if (not (null? schedule))
         (begin
           (set! first-node (car schedule))
           (set! second-node (cadr schedule))
           (set! detection-track (get-dt first-node second-node))
-          (if (detection-track)
-              (begin ((detection-track 'get-id)) ((train 'set-schedule) (cddr schedule)))
-              (begin ((train 'set-schedule) cdr schedule) (get-next-detection-track train)
+          (if detection-track
+              (begin (detection-track 'get-id) ((train 'set-schedule!) (cddr schedule)))
+              (begin ((train 'set-schedule!) (cdr schedule)) (get-next-detection-track train)
                      ))
           detection-track)
         #f))
@@ -78,9 +82,9 @@
             (set-switch-state! id 2))))
 
   (define (calculate-direction node1 node2)
-    (define track (get-track node1 node2))
+    (define track (find-railwaypiece node1 node2))
     (define direction 0)
-    (if (eq? ((track 'get-node1)) node1)
+    (if (eq? (track 'get-node1) node1)
         (set! direction +1)
         (set! direction -1))
     direction)
@@ -88,15 +92,17 @@
   (define (calculate-train-movement train) ;Makes the train move, and the switches be set correctly
     (define train-id (train 'get-id))
     (define schedule (train 'get-schedule))
+    ;(display schedule)
     (define location (get-loco-detection-block train-id))
     (define current (current-node schedule))
     (define next (next-node schedule))
-    (define nextnext (next-node (next-node schedule)))
+    (define rw-piece (find-railwaypiece current next))
     (define max-speed ((find-railwaypiece current next) 'get-max-speed))
     (define track (find-railwaypiece current next))
 
     (define (move)
       (define (switch-setter) ; Switchen moeten op tijd klaar gezet worden
+        (define nextnext (next-node (cdr schedule)))
         (when (eq? 'switch (track 'get-type))
           (calculate-switch track next nextnext)))
 
@@ -108,11 +114,12 @@
           (next-track (set! max-speed (min max-speed (next-track 'get-max-speed))) (next-max-speed (cdr schedule))) ; If on normal track, it can go further
           ))
       (switch-setter)
-      (next-max-speed))
+      (next-max-speed schedule))
     (cond
       ((>= 2 (length schedule)) 0) ; train should come to a stop
       ((eq? 'red (get-next-detection-track train)) 0)
-      (else (* (calculate-direction current next) (min (train 'get-max-speed) (move))))))
+      (else (* (calculate-direction current next)
+               (min (train 'get-max-speed) (move))))))
 
 
   (define (dispatch msg)

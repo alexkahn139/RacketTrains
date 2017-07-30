@@ -23,5 +23,5 @@
       ; Setters
       ((eq? msg 'set-schedule!) set-schedule!)
       (else
-       (error "Message not understood"))))
+       (error "Message not understood" msg))))
   dispatch)

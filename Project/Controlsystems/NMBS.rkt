@@ -19,11 +19,12 @@
 
   (define (print-status)
     (hash-for-each (rwm-dt railwaymodel)
-                   (lambda (detection-track)
+                   (lambda (id detection-track)
                      (display "Detection track: ")
                      (display (detection-track 'get-id))
                      (display ": Is free ")
-                     (display (detection-track 'free))))
+                     (display (detection-track 'free?))
+                     (newline)))
     (for-each
      (lambda (track)
        (display "Track: ")
@@ -33,7 +34,7 @@
        (display ": Is free ")
        (display (track 'free?))
        (newline))
-     (rwm-ts)))
+     (rwm-ts railwaymodel)))
 
   ; Ik snap niet helemaal wat hier het doel is van nmbs
   ;(define (pre-process train) ; Plan a trainride via free tracks, so the scheduling get's less problems

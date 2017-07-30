@@ -75,7 +75,7 @@
           (y2 (node2 'get-y))
           (id (dt 'get-id))
           (occupied? ((infrabel 'get-light) dt)))
-       (set! dt-list (cons (list x1 y1 x2 y2 (symbol->string id) occupied?) dt-list)))))
+       (set! dt-list (cons (list x1 y1 x2 y2 (number->string id) occupied?) dt-list)))))
   dt-list)
 
 (define (get-switches)
@@ -214,15 +214,28 @@
    (lambda (id loco)
      (set! loco-list (cons (string-append "Train " (number->string (loco 'get-id))) loco-list))))
   loco-list)
-(define choice-list (train-field-list))
+(define train-choice-list (train-field-list))
+(define chosen-train (car train-choice-list))
 (define trains-field (new combo-field%
-
                           (label "Choose train")
                           (parent btn-panel)
-                          (choices choice-list)
-                          (init-value (car choice-list))
+                          (choices train-choice-list)
+                          (init-value (car train-choice-list))
                           ))
-
+(define (dt-field-list)
+  (define dt-list '())
+  (hash-for-each
+   (rwm-dt railwaymodel)
+   (lambda (id dt)
+     (set! dt-list (cons (string-append "Detectiontrack " (number->string (dt 'get-id))) dt-list))))
+  dt-list)
+(define dt-choice-list (dt-field-list))
+(define dt-field (new combo-field%
+                      (label "Choose detectiontrack")
+                      (parent btn-panel)
+                      (choices dt-choice-list)
+                      (init-value (car dt-choice-list))
+                      ))
 
 (new button% [parent btn-panel]
      [label "Drive"]

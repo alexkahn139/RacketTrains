@@ -25,6 +25,7 @@
       ((eq? msg 'get-node1) node1)
       ((eq? msg 'get-node2) node2)
       ((eq? msg 'occupied?) occupied)
+      ((eq? msg 'free?) (not occupied))
       ((eq? msg 'get-max-speed) max-speed)
       ((eq? msg 'get-id) id)
       ; setters

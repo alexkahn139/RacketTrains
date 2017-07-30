@@ -7,7 +7,7 @@
 
 (provide make-track)
 
-(define (make-track node1 node2 [max-speed 10]) 
+(define (make-track node1 node2 [max-speed 10])
   (define type 'track)
   (define occupied #f)
 
@@ -24,6 +24,7 @@
       ((eq? msg 'get-node1) node1)
       ((eq? msg 'get-node2) node2)
       ((eq? msg 'occupied?) occupied)
+      ((eq? msg 'free?) (not occupied))
       ((eq? msg 'get-max-speed) max-speed)
       ; setters
       ((eq? msg 'free!) free!)

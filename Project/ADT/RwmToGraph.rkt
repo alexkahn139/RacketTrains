@@ -35,8 +35,8 @@
      node-dict
      (lambda (n g)
        (when (eq? g graph-n)
-         (set! res n)))
-     res))
+         (set! res n))))
+     res)
 
   ; The edges of the graph should represent the ways between the edges
   ;; For the calculation of a path, it shouldn't matter if the edge is a track,
@@ -73,15 +73,18 @@
     )
 
   (define (calculate-path block-1 block-2)
-    (define (list-from-mcons mlist list)
-      (if (null? mlist)
-          (reverse list)
-          (list-from-mcons (mcdr mlist) (cons (mcar mlist) list))))
+    (define (list-from-mcons mlist)
+      (define (iterloop m-l l)
+        (if (null? m-l)
+            (reverse l)
+            (iterloop (mcdr m-l) (cons (mcar m-l) l))))
+      (iterloop mlist '()))
     (define start-node ((hash-ref (rwm-dt railwaymodel) block-1) 'get-node1))
     (define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
     (define start-vertex (hash-ref node-dict start-node))
     (define stop-vertex (hash-ref node-dict stop-node))
-    (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex) '())))
+    (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
+
  ; Calculates the path, changes it to a list en finally, returns the list with the number-of-nodes
 
 	(build-graph)
