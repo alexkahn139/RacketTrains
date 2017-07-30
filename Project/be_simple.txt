@@ -1,4 +1,3 @@
-L 1 A3 A2
 L 2 Lv Gk
 N Bx 500 500
 N Mx 550 600

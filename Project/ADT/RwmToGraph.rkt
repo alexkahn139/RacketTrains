@@ -83,7 +83,7 @@
     (define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
     (define start-vertex (hash-ref node-dict start-node))
     (define stop-vertex (hash-ref node-dict stop-node))
-    (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
+    (reverse (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex)))))
 
  ; Calculates the path, changes it to a list en finally, returns the list with the number-of-nodes
 
