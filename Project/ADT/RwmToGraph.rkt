@@ -36,7 +36,7 @@
      (lambda (n g)
        (when (eq? g graph-n)
          (set! res n))))
-     res)
+    res)
 
   ; The edges of the graph should represent the ways between the edges
   ;; For the calculation of a path, it shouldn't matter if the edge is a track,
@@ -59,7 +59,8 @@
        (let*
            ((node1 (hash-ref node-dict (ss 'get-node1)))
             (node2 (hash-ref node-dict (ss 'get-node2)))
-            (node3 (hash-ref node-dict (ss 'get-node3))))
+            (node3 (hash-ref node-dict (ss 'get-node3)))
+            )
          (add-track! node1 node2)
          (add-track! node1 node3))))
 
@@ -79,15 +80,35 @@
             (reverse l)
             (iterloop (mcdr m-l) (cons (mcar m-l) l))))
       (iterloop mlist '()))
-    (define start-node ((hash-ref (rwm-dt railwaymodel) block-1) 'get-node1))
-    (define stop-node ((hash-ref (rwm-dt railwaymodel) block-2) 'get-node1))
+    (define start-block (hash-ref (rwm-dt railwaymodel) block-1))
+    (define start-node (start-block 'get-node1))
+    (define stop-block (hash-ref (rwm-dt railwaymodel) block-2))
+    (define stop-node (stop-block 'get-node1))
     (define start-vertex (hash-ref node-dict start-node))
     (define stop-vertex (hash-ref node-dict stop-node))
-    (reverse (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex)))))
+    (define schedule (reverse (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex)))))
+    (display "Schedule before ")
+    (displayln schedule)
+    (set! schedule (make-usable-path schedule start-block stop-block))
+    (display "Schedule after ")
+    (displayln schedule)
+    schedule)
 
- ; Calculates the path, changes it to a list en finally, returns the list with the number-of-nodes
+  (define (make-usable-path path from-block to-block)
+    (define nA (from-block 'get-node1))
+    (define nB (from-block 'get-node2))
+    (define nC (to-block 'get-node1))
+    (define nD (to-block 'get-node2))
+    (when (and (not (= (length path) 1)) (not (eq? (cadr path) nB)))
+      (set! path (list (car path) nB (cdr path))))
+    (set! path (reverse path))
+    (when (not (eq? (cadr path) nD))
+      (set! path (list (car path) nD (cdr path))))
+    (set! path (reverse (flatten path)))
+    path)
+  ; Calculates the path, changes it to a list en finally, returns the list with the number-of-nodes
 
-	(build-graph)
+  (build-graph)
   (define (dispatch msg)
     (cond
       ;((eq? msg 'build-graph) build-graph)
