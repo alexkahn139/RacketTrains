@@ -30,5 +30,5 @@
       ((eq? msg 'free!) free!)
       ((eq? msg 'occupy!) occupy!)
       (else
-       (error "Message not understood"))))
+       (error "Message not understood" msg))))
   dispatch)

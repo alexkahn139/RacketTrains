@@ -24,7 +24,4 @@
 
 (when loop
   (thread main))
-;((NMBS 'schedule-destination!) 1 2)
-;Nm
-;Mx
-;A2
+((NMBS 'schedule-destination!) 2 2)
