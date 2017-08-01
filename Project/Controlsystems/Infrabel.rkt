@@ -38,6 +38,7 @@
                                            (when (eq? next-dt (get-locomotive-location (train 'get-id)))
                                              (define schedule (train 'get-schedule))
                                              (fix-schedule train next-dt schedule)
+                                             (fix-switches schedule)
                                              (find-next-dt train schedule)))))
 
   (define (get-light track) ; Returns true, when the light is red
@@ -54,8 +55,7 @@
     light)
 
   (define (drive-train train)
-    ;(display "Train ") (display (train 'get-id)) (displayln "get's driven")
-    (define schedule (train 'get-schedule)) 
+    (define schedule (train 'get-schedule))
     (define (arrived)
       (set-loco-speed! (train 'get-id) 0)
       (clear-schedule train))
@@ -94,6 +94,14 @@
 
     (display schedule))
 
+  (define (fix-switches schedule)
+    (define (set-loop rst-sched)
+			(when (> (length rst-sched) 2)
+				(define track (find-railwaypiece (car rst-sched) (cdr rst-sched)))
+				(when (and track (eq? 'switch (track 'get-type)))
+					(calculate-switch track (car rst-sched) (cdr rst-sched)))
+				(set-loop (cdr rst-sched))))
+		(set-loop schedule))
 
   (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
     (define id (switch 'get-id))
