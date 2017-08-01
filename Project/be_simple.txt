@@ -16,7 +16,7 @@ S Bx Nm Mx Lv
 S Mx Bx A1 Gt
 S A1 Mx A2 A3
 S Gt Mx Bg Kr
-T Gk Lg
+D 6 Gk Lg
 D 1 Lv Gk
 D 2 Nm Lg
 D 3 A2 A3
