@@ -12,3 +12,4 @@
 *.texpadtmp
 *.png
 Project/.DS_Store
+#*.rkt*
