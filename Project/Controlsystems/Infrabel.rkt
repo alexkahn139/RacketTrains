@@ -33,7 +33,7 @@
   (define (update)
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
                                            (drive-train train)
-                                           (next-detection-track train))))
+                                           (prepare-tracks train))))
 
   (define (get-light track)
     (define track-id (track 'get-id))
@@ -62,22 +62,27 @@
           )
     )
 
-  (define (next-detection-track train)
+  (define (prepare-tracks train)
     (define last-dt (train 'get-last-dt))
-    (define (set-next-dt)	; Altijd als we op een dt komen kunnen we het pad tot daar deleten + de volgende zetten
+    (define (set-next-parts)	; Altijd als we op een dt komen kunnen we het pad tot daar deleten + de volgende zetten
       (define schedule (train 'get-schedule))
       (define (set-loop rest-of-schedule)
         (when (< 2 (length rest-of-schedule))
           (define testtrack (find-railwaypiece (car schedule) (cdr schedule)))
-          (if (and testtrack (eq? 'detection-track (testtrack 'type)))
-              (begin
-                ((train 'set-schedule!) rest-of-schedule)
-                ((train 'set-next-dt!) (testtrack 'id)))
-              (set-loop (cdr rest-of-schedule)))))
+          (cond ((and testtrack (eq? 'detection-track (testtrack 'type)))
+                 (begin
+                   ((train 'set-schedule!) rest-of-schedule)
+                   ((train 'set-next-dt!) (testtrack 'id)))
+                 (set-loop (cdr rest-of-schedule)))
+                ((and testtrack (eq? 'switch (testtrack 'type)))
+                 (begin
+                   (calculate-switch testtrack (car rest-of-schedule) (cdr rest-of-schedule))
+                   (set-loop (cdr rest-of-schedule))))                 
+                )))
       (set-loop schedule))
     ;(when (eq? (last-dt 'iq) (get-locomotive-location (train 'get-id)))
-    (set-next-dt))
-    
+    (set-next-parts))
+
 
   (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
     (define id (switch 'get-id))
