@@ -27,9 +27,13 @@
   (define (set-switch-state! id new-pos)
     (set-switch-position! id new-pos))
 
+  (define (clear-schedule train)
+    ((train 'set-schedule!) '()))
+
   (define (update)
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
-                                           (drive-train train))))
+                                           (drive-train train)
+                                           (next-detection-track train))))
 
   (define (get-light track)
     (define track-id (track 'get-id))
@@ -49,7 +53,7 @@
     (define schedule (train 'get-schedule))
     (define (arrived)
       (set-loco-speed! (train 'get-id) 0)
-      ((train 'set-schedule!) '()))
+      (clear-schedule train))
     (cond ((null? schedule) (set-loco-speed! (train 'get-id) 0))
           ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id) (get-locomotive-location (train 'get-id))) (arrived))
           ;(((get-next-detection-track train) 'occupied?) (set-loco-speed! (train 'get-id) 0))
@@ -58,9 +62,22 @@
           )
     )
 
-  ;(define (get-next-detection-track train)
-
-    ;detection-track)
+  (define (next-detection-track train)
+    (define last-dt (train 'get-last-dt))
+    (define (set-next-dt)	; Altijd als we op een dt komen kunnen we het pad tot daar deleten + de volgende zetten
+      (define schedule (train 'get-schedule))
+      (define (set-loop rest-of-schedule)
+        (when (< 2 (length rest-of-schedule))
+          (define testtrack (find-railwaypiece (car schedule) (cdr schedule)))
+          (if (and testtrack (eq? 'detection-track (testtrack 'type)))
+              (begin
+                ((train 'set-schedule!) rest-of-schedule)
+                ((train 'set-next-dt!) (testtrack 'id)))
+              (set-loop (cdr rest-of-schedule)))))
+      (set-loop schedule))
+    ;(when (eq? (last-dt 'iq) (get-locomotive-location (train 'get-id)))
+    (set-next-dt))
+    
 
   (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
     (define id (switch 'get-id))
@@ -95,20 +112,20 @@
         (cond
           ((< (length (cdr schedule)) 2) max-speed)
           (else (loop max-speed (cdr schedule))))))
-  (loop loco-speed schedule))
+    (loop loco-speed schedule))
 
-(define (dispatch msg)
-  (cond
-    ((eq? msg 'update) update)
-    ; Getters
-    ((eq? msg 'get-locomotive-speed) get-locomotive-speed)
-    ((eq? msg 'get-locomotive-location) get-locomotive-location)
-    ((eq? msg 'get-switch-state) get-switch-state)
-    ((eq? msg 'get-light) get-light)
-    ; Setters
-    ((eq? msg 'set-switch-state!) set-switch-state!)
+  (define (dispatch msg)
+    (cond
+      ((eq? msg 'update) update)
+      ; Getters
+      ((eq? msg 'get-locomotive-speed) get-locomotive-speed)
+      ((eq? msg 'get-locomotive-location) get-locomotive-location)
+      ((eq? msg 'get-switch-state) get-switch-state)
+      ((eq? msg 'get-light) get-light)
+      ; Setters
+      ((eq? msg 'set-switch-state!) set-switch-state!)
 
-    (else (error "Unknown message"))
-    ))
-(start-simulator)
-dispatch)
+      (else (error "Unknown message"))
+      ))
+  (start-simulator)
+  dispatch)
