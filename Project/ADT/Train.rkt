@@ -5,18 +5,22 @@
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(require "../Simulator/interface.rkt")
+
+
 (provide make-train)
 
 (define (make-train id)
   (define max-speed 20)
   (define schedule '())
-	(define last-detection-track '())
+	(define next-detection-track '())
 
   (define (set-schedule! schedule-list)
+    (set! next-detection-track (get-loco-detection-block id))
     (set! schedule schedule-list))
 
-	(define (set-last-detection-track! dt-id)
-		(set! last-detection-track dt-id))
+	(define (set-next-detection-track! dt-id)
+		(set! next-detection-track dt-id))
 
   (define (dispatch msg)
     (cond
@@ -24,10 +28,10 @@
       ((eq? msg 'get-id) id)
       ((eq? msg 'get-max-speed) max-speed)
       ((eq? msg 'get-schedule) schedule)
-			((eq? msg 'get-last-dt) last-detection-track)
+			((eq? msg 'get-next-dt) next-detection-track)
       ; Setters
       ((eq? msg 'set-schedule!) set-schedule!)
-			((eq? msg 'set-last-dt!) set-last-detection-track!)
+			((eq? msg 'set-next-dt!) set-next-detection-track!)
       (else
        (error "Message not understood" msg))))
   dispatch)

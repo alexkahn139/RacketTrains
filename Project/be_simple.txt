@@ -1,3 +1,4 @@
+L 1 Nm Lg
 L 2 Lv Gk
 N Bx 500 500
 N Mx 550 600

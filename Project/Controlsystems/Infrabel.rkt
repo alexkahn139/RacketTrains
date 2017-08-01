@@ -33,9 +33,14 @@
   (define (update)
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
                                            (drive-train train)
-                                           (prepare-tracks train))))
+                                           ;(prepare-tracks train)
+                                           (define next-dt (train 'get-next-dt))
+                                           (when (eq? next-dt (get-locomotive-location (train 'get-id)))
+                                             (define schedule (train 'get-schedule))
+                                             (fix-schedule train next-dt schedule)
+                                             (find-next-dt train schedule)))))
 
-  (define (get-light track)
+  (define (get-light track) ; Returns true, when the light is red
     (define track-id (track 'get-id))
     (define light #f)
     (hash-for-each
@@ -50,38 +55,44 @@
 
   (define (drive-train train)
     ;(display "Train ") (display (train 'get-id)) (displayln "get's driven")
-    (define schedule (train 'get-schedule))
+    (define schedule (train 'get-schedule)) 
     (define (arrived)
       (set-loco-speed! (train 'get-id) 0)
       (clear-schedule train))
-    (cond ((null? schedule) (set-loco-speed! (train 'get-id) 0))
-          ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id) (get-locomotive-location (train 'get-id))) (arrived))
-          ;(((get-next-detection-track train) 'occupied?) (set-loco-speed! (train 'get-id) 0))
-          (else (set-loco-speed! (train 'get-id) (calculate-train-movement train)))
-          ;(else (display (calculate-train-movement train)))
-          )
-    )
+    (if (null? schedule)
+        (set-loco-speed! (train 'get-id) 0)
+        (begin
+          (let*
+              ((next-dt (train 'get-next-dt))
+               (det (hash-ref (rwm-dt railwaymodel) next-dt)))
+            (cond ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id) (get-locomotive-location (train 'get-id))) (arrived))
+                  ((get-light det) (set-loco-speed! (train 'get-id) 0))
+                  (else (set-loco-speed! (train 'get-id) (calculate-train-movement train)))
+                  ;(else (display (calculate-train-movement train)))
+                  )
+            ))))
+
+  (define (fix-schedule train next-dt rest-schedule)
+    (when (> (length rest-schedule) 2)
+      (define testtrack (find-railwaypiece (car rest-schedule) (cdr rest-schedule)))
+      (if (and testtrack (eq? 'detectiontrack (testtrack 'get-type)) (eq? next-dt (testtrack 'get-id)))
+          ((train 'set-schedule!) (cdr (cdr rest-schedule)))
+          (fix-schedule train next-dt (cdr rest-schedule)))))
+
+  (define (find-next-dt train schedule)
+    (define (find-loop rst-sched)
+      (when (> (length rst-sched) 2)
+      (define track (find-railwaypiece (car rst-sched) (cdr rst-sched)))
+      (if (and track (eq? 'detectiontrack (track 'get-type)))
+          ((train 'set-next-dt!) track)
+          (find-loop (cdr rst-sched)))))
+    (find-loop schedule))
 
   (define (prepare-tracks train)
-    (define last-dt (train 'get-last-dt))
-    (define (set-next-parts)	; Altijd als we op een dt komen kunnen we het pad tot daar deleten + de volgende zetten
-      (define schedule (train 'get-schedule))
-      (define (set-loop rest-of-schedule)
-        (when (< 2 (length rest-of-schedule))
-          (define testtrack (find-railwaypiece (car schedule) (cdr schedule)))
-          (cond ((and testtrack (eq? 'detection-track (testtrack 'type)))
-                 (begin
-                   ((train 'set-schedule!) rest-of-schedule)
-                   ((train 'set-next-dt!) (testtrack 'id)))
-                 (set-loop (cdr rest-of-schedule)))
-                ((and testtrack (eq? 'switch (testtrack 'type)))
-                 (begin
-                   (calculate-switch testtrack (car rest-of-schedule) (cdr rest-of-schedule))
-                   (set-loop (cdr rest-of-schedule))))                 
-                )))
-      (set-loop schedule))
-    ;(when (eq? (last-dt 'iq) (get-locomotive-location (train 'get-id)))
-    (set-next-parts))
+    (define next-dt (train 'get-next-dt))
+    (define schedule (train 'get-schedule))
+
+    (display schedule))
 
 
   (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
@@ -133,4 +144,5 @@
       (else (error "Unknown message"))
       ))
   (start-simulator)
+
   dispatch)
