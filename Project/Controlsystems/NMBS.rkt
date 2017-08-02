@@ -47,7 +47,8 @@
     (define train (find-train train-id))
     (define location ((infrabel 'get-locomotive-location) train-id))
     (define path ((planner 'calculate-path) location destination)) ; Met de grafalgorithmen hier de korste weg berekenen
-    ((train 'set-schedule!) path))
+    ((train 'set-schedule!) path)
+		(displayln path))
 
 
   (define (dispatch msg)

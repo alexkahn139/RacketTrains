@@ -18,7 +18,7 @@ S A1 Mx A2 A3
 S Gt Mx Bg Kr
 D 6 Gk Lg
 D 1 Lv Gk
-D 2 Nm Lg
+D 2 Lg Nm
 D 3 A2 A3
 D 4 Bg Os
 D 5 Os Kr
