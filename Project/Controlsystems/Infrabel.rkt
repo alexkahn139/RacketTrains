@@ -67,7 +67,6 @@
           (cond ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id) (get-locomotive-location (train 'get-id))) (arrived))
                 ((and (not (eq? next-dt (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0))
                 (else (set-loco-speed! (train 'get-id) (calculate-train-movement train)))
-                ;(else (display (calculate-train-movement train)))
                 )
           ))))
 
@@ -115,11 +114,7 @@
 					((and (eqv? n1 nB) (eqv? n2 nA))
 					 (set-switch-state! id 1))
 					((and (eqv? n1 nB) (eqv? n3 nA))
- 					 (set-switch-state! id 2))
-					 (else
-						 (displayln " - Huh wtf")))
-
-		(displayln (get-switch-state id)))
+ 					 (set-switch-state! id 2))))
 
   (define (calculate-direction train nodeA nodeB)
     (define track (find-railwaypiece nodeA nodeB))

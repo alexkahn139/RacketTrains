@@ -110,11 +110,8 @@
     (define start-vertex (hash-ref node-dict start-node))
     (define stop-vertex (hash-ref node-dict stop-node))
     (define schedule (reverse (map real-node (list-from-mcons (shortest-path node-graph start-vertex stop-vertex)))))
-    (displayln schedule)
     (set! schedule (make-usable-path schedule start-block stop-block))
-    (displayln schedule)
     (set! schedule (fix-switches schedule block-1 block-2))
-    (displayln schedule)
     schedule)
 
   (define (make-usable-path path begin end)
