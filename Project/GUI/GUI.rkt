@@ -263,7 +263,6 @@
      [label "Drive"]
      ; Callback procedure for a button click:
      (callback (lambda (button event)
-                 (displayln train-choice)
                  ((nmbs 'schedule-destination!) (string->number train-choice) dt-choice)))) ; Hier de geselecteerde trein laten rijden
 
 
