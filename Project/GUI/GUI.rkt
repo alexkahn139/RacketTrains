@@ -28,11 +28,13 @@
 ; Load all the bitmaps
 (define locomotive  (read-bitmap "GUI/loco.jpeg"))
 
+; Needed for the choice menu's
 (define train-choice 1)
 (define dt-choice 1)
 
 (define (set-color! color)
   (send dc set-pen (send the-pen-list find-or-create-pen color 4 'solid 'round)))
+
 ; Make a frame by instantiating the frame% class
 (define train-frame (new frame%
                          [label "Racket Trains"]
@@ -42,7 +44,7 @@
 (define (scale coordinate)
   (/ (* coordinate size) 1000))
 
-; Get all the things that should be drawn (Locomotives, nodes, tracks switches)
+; Get all the things that should be drawn (Locomotives, nodes, tracks switches) and put them in a list
 (define (get-nodes)
   (define node-list '())
   (hash-for-each
@@ -123,7 +125,7 @@
        (set! loco-list (cons (list id dt) loco-list)))))
   loco-list)
 
-; Draw functions
+; Draw functions, they use the list to correctly model the railwaymodel
 (define (draw-nodes)
   (define nodes (get-nodes))
   (for-each (lambda (node)
@@ -185,6 +187,7 @@
               (send dc draw-text (number->string (get-switch-position sid)) (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
               )
             switches))
+
 (define (draw-locos infrabel)
   (define locos (get-locomotives infrabel))
   (for-each (lambda (loco)
@@ -196,11 +199,10 @@
                 (define x2 (scale (node2 'get-x)))
                 (define y1 (scale (node1 'get-y)))
                 (define y2 (scale (node2 'get-y)))
-                (send dc draw-bitmap locomotive (/ (+ x1 x2) 2) (/ (+ y1 y2) 2)))
-              (when (not (cadr loco))
-                (send msg set-label "Not all locs on dt")))
+                (send dc draw-bitmap locomotive (/ (+ x1 x2) 2) (/ (+ y1 y2) 2))))
             locos))
-(define (draw-all infrabel NMBS)
+
+(define (draw-all infrabel NMBS) ; Get's called to draw all the parts
   (set! infra infrabel)
   (set! nmbs NMBS)
   (send dc clear)
@@ -208,11 +210,8 @@
   (draw-dt infrabel)
   (draw-tracks)
   (draw-nodes)
-  (draw-locos infrabel)
-  )
-; Make a static text message in the frame
-(define msg (new message% [parent train-frame]
-                 [label "No events so far..."]))
+  (draw-locos infrabel))
+
 
 ; Make a button in the frame
 (define draw-panel (new horizontal-panel% [parent train-frame]
@@ -269,13 +268,6 @@
 ; Derive a new canvas (a drawing window) class to handle events
 (define my-canvas%
   (class canvas% ; The base class is canvas%
-    ;; Define overriding method to handle mouse events
-    ;(define/override (on-event event)
-    ;  (send msg set-label "Canvas mouse"))
-    ;; Define overriding method to handle keyboard events
-    ;(define/override (on-char event)
-    ;  (send msg set-label "Canvas keyboard"))
-    ;; Call the superclass init, passing on all init args x1t y1t x2t y2t))
     (super-new)))
 
 ; Make a canvas that handles events in the frame
@@ -284,4 +276,3 @@
 
 
 (send train-frame show #t)
-; Draw all the things

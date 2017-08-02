@@ -17,7 +17,6 @@
          track-eqv?
          get-dt
          get-switch
-         find-nodes-middle
          find-railwaypiece
          find-train
          railwaymodel
@@ -27,7 +26,7 @@
 ; Based on the file given by the assitants
 (define (load-rwm filename)
   (let ([lines (map string-split (file->lines filename))]
-        [ls (make-hash)]
+        [ls (make-hash)] ; Hashing makes, finding the right pieces back better
         [ns (make-hash)]
         [ss (make-hash)]
         [ts '()]
@@ -73,21 +72,6 @@
            (eq? (t1 'get-node2)
                  (t2 'get-node1)))))
 
-
-(define (get-track node1 node2)
-  (define t #f)
-  (for-each
-   (lambda (track)
-     (let*
-         ((nodeA (track 'get-node1))
-          (nodeB (track 'get-node2)))
-       (when (or (and (eq? node1 nodeA)
-                      (eq? node2 nodeB))
-                 (and (eq? node2 nodeA)
-                      (eq? node1 nodeB)))
-                 (set! t track))))
-   (rwm-ts railwaymodel))
-  t)
 (define (find-railwaypiece node1 node2) ; You don't know if you need a switch, detection-block or track
   (define track '())
   (cond
@@ -97,6 +81,20 @@
      (set! track (get-track node1 node2))))
   track)
 
+  (define (get-track node1 node2)
+    (define t #f)
+    (for-each
+     (lambda (track)
+       (let*
+           ((nodeA (track 'get-node1))
+            (nodeB (track 'get-node2)))
+         (when (or (and (eq? node1 nodeA)
+                        (eq? node2 nodeB))
+                   (and (eq? node2 nodeA)
+                        (eq? node1 nodeB)))
+                   (set! t track))))
+     (rwm-ts railwaymodel))
+    t)
 
 (define (get-dt node1 node2)
   (define detectiontrack #f)
@@ -130,12 +128,6 @@
                              )
                              (set! switch ss))))
   switch)
-(define (find-nodes-middle node1 node2)
-  (define x1 (node1 'get-x))
-  (define y1 (node1 'get-y))
-  (define x2 (node2 'get-x))
-  (define y2 (node2 'get-y))
-  (cons (/ (+ x1 x2) 2) (/ (+ y1 y2) 2)))
 
 (define (find-train train-id)
   (hash-ref (rwm-ls railwaymodel) train-id))

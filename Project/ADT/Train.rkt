@@ -11,6 +11,7 @@
 (provide make-train)
 
 (define (make-train id)
+
   (define max-speed 20)
   (define schedule '())
   (define direction 1)

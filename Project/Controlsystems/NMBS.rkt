@@ -17,7 +17,7 @@
 
   (define planner (make-rwm-to-graph))
 
-  (define (print-status)
+  (define (print-status) ; Not really needed, the GUI shows it all
     (hash-for-each (rwm-dt railwaymodel)
                    (lambda (id detection-track)
                      (display "Detection track: ")
@@ -35,13 +35,6 @@
        (display (track 'free?))
        (newline))
      (rwm-ts railwaymodel)))
-
-  ; Ik snap niet helemaal wat hier het doel is van nmbs
-  ;(define (pre-process train) ; Plan a trainride via free tracks, so the scheduling get's less problems
-  ;  (define schedule (train 'schedule))
-  ;  (define (occupy-next-parts sched) ; This way a train get's priority over the tracks
-  ;    (when (< 1 (rest-nodes sched)))
-  ;      ))
 
   (define (schedule-destination! train-id destination) ; Need the ID of the train and the destination
     (define train (find-train train-id))

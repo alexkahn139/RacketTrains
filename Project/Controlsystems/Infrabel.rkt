@@ -30,7 +30,7 @@
   (define (clear-schedule train)
     ((train 'set-schedule!) '()))
 
-  (define (update)
+  (define (update) ; Update function. Moves the train if needed, and sets the switches correctly
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
                                            ;(prepare-tracks train)
                                            (define next-dt (train 'get-next-dt))
@@ -54,7 +54,7 @@
      )
     light)
 
-  (define (drive-train train)
+  (define (drive-train train) ; Makes the train move if needed, by calculating the max allowed speed
     (define schedule (train 'get-schedule))
     (define (arrived)
       (set-loco-speed! (train 'get-id) 0)
@@ -64,11 +64,11 @@
         (let*
             ((next-dt (train 'get-next-dt))
              (det (hash-ref (rwm-dt railwaymodel) next-dt)))
-          (cond ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id) (get-locomotive-location (train 'get-id))) (arrived))
-                ((and (not (eq? next-dt (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0))
+          (cond ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id)  (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
+                ((and (not (eq? next-dt (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0)) ; If there is another train, the train stops
                 (else (set-loco-speed! (train 'get-id) (calculate-train-movement train))))))))
 
-  (define (fix-schedule train next-dt rest-schedule)
+  (define (fix-schedule train next-dt rest-schedule) ; Function to delete te part of the schedule that's already driven
     (when (> (length rest-schedule) 2)
       (define testtrack (find-railwaypiece (car rest-schedule) (cdr rest-schedule)))
       (if (and testtrack (eq? 'detectiontrack (testtrack 'get-type)) (eq? next-dt (testtrack 'get-id)))
@@ -85,7 +85,7 @@
     (find-loop schedule))
 
 
-  (define (fix-switches schedule)
+  (define (fix-switches schedule) ; Set's the switches correctly
     (define (set-loop rst-sched)
       (when (> (length rst-sched) 2)
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
@@ -100,7 +100,7 @@
         (set-loop (cdr rst-sched))))
     (set-loop schedule))
 
-  (define (calculate-switch switch nA nB) ;Enkel switchen mee geven indien nodig verplaatsen
+  (define (calculate-switch switch nA nB)
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
     (define n2 (switch 'get-node2))
@@ -118,8 +118,7 @@
     (define track (find-railwaypiece nodeA nodeB))
     (if (eq? (track 'get-node1) nodeA)
         ((train 'set-direction!) +1)
-        ((train 'set-direction!) -1))
-    )
+        ((train 'set-direction!) -1)))
 
   (define (calculate-train-movement train)
     (define schedule (train 'get-schedule))

@@ -88,7 +88,7 @@
       (delete-track! node1 node2)
       (set! correct-path (calculate-path block1 block2))
       (add-track! node1 node2))
-    (define (fix-double carNode caddrNode switch1 switch2)
+    (define (fix-double carNode caddrNode switch1 switch2) ; Function to try fixing a path where the doube switch, makes fork
       ;(define new-sched path)
       (define (fix-loop sched new-sched)
         ;(when (<= 3 (length sched))
@@ -104,12 +104,19 @@
               (fix-switch rest-of-path)
               (let* ((track (find-railwaypiece (car rest-of-path) (cadr rest-of-path)))
                      (pos-track (find-railwaypiece (cadr rest-of-path) (caddr rest-of-path))))
+                ;;;;
+                ;;;;  DOES NOT WORK CORRECTLY
+                ;;;;  For the moment always false to use the else expression
+                ;;;;
                 (if (and (eq? 'switch (track 'get-type)) ; Hier zou een test moeten staan maar ik vind niet was
                          (eq? 'switch (pos-track 'get-type))
                          #f)
                     (error "This way doesn't work ~a ~a ~a" (track 'get-id) (cadr rest-of-path) (caddr rest-of-path))
                     ;(set! correct-path (fix-double (car rest-of-path) (caddr rest-of-path) track pos-track))
                     (check-loop (cdr rest-of-path)))))))
+                ;;;;
+                ;;;;
+                ;;;;
       (check-loop path)
       correct-path)
 
@@ -151,4 +158,3 @@
         (else (error "Unknown message"))
         ))
     dispatch)
-  
