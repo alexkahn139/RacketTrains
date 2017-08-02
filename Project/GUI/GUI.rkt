@@ -8,13 +8,15 @@
 (require "../ADT/RailwayModel.rkt")
 (require "../Abstractions.rkt")
 (require "../Controlsystems/Infrabel.rkt")
+(require "../Simulator/interface.rkt")
+
 
 (require racket/gui/base)
 
 (provide
  draw-all)
 
-(define railwaymodel (load-rwm "be_simple.txt"))
+;(define railwaymodel (load-rwm "be_simple.txt"))
 (define infra '())
 (define train-list '())
 ;(define infrabel (make-infrabel))
@@ -96,7 +98,7 @@
           (y3 (node3 'get-y))
           (idx (id 'get-x))
           (idy (id 'get-y)))
-       (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (symbol->string (switch 'get-id))) switch-list)))))
+       (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (switch 'get-id)) switch-list)))))
   switch-list)
 
 (define (get-locomotives infrabel)
@@ -166,12 +168,15 @@
               (define xid (scale (xID switch)))
               (define yid (scale (yID switch)))
               (define sid (sID switch))
-              ; (send dc set-text-foreground "black") (send dc draw-text sid (+ 4 xid) (+ yid 4)) ; Is zelfde als de node
+              (send dc set-text-foreground "black")
+							;(send dc draw-text sid (+ 4 xid) (+ yid 4)) ; Is zelfde als de node
               (set-color! "black")
               (send dc draw-line x1 y1 xid yid)
               (send dc draw-line x2 y2 xid yid)
               (send dc draw-line x3 y3 xid yid)
-              )
+							(send dc set-text-foreground "black")
+              (send dc draw-text (number->string (get-switch-position sid)) (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
+							)
             switches))
 (define (draw-locos infrabel)
   (define locos (get-locomotives infrabel))
