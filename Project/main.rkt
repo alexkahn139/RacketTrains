@@ -11,19 +11,18 @@
 (require "../Project/ADT/RailwayModel.rkt")
 
 
-  (define infrabel (make-infrabel))
-  (define NMBS (make-nmbs infrabel))
-  (define loop #t)
+(define infrabel (make-infrabel))
+(define NMBS (make-nmbs infrabel))
+(define loop #t)
 
-  (define (main)
-    ((infrabel 'update))
-    (draw-all infrabel)
-    (sleep 0.02)
-    (when loop
-      (main)))
+(define (main)
+  ((infrabel 'update))
+  (draw-all infrabel NMBS)
+  (sleep 0.02)
+  (when loop
+    (main)))
 
 (when loop
   (thread main))
-((NMBS 'schedule-destination!) 2 2)
-((NMBS 'schedule-destination!) 2 5)
+
 

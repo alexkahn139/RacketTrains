@@ -18,12 +18,19 @@
 
 ;(define railwaymodel (load-rwm "be_simple.txt"))
 (define infra '())
+(define nmbs '())
 (define train-list '())
 ;(define infrabel (make-infrabel))
+
+
 
 (define size 800)
 ; Load all the bitmaps
 (define locomotive  (read-bitmap "GUI/loco.jpeg"))
+
+(define train-choice 1)
+(define dt-choice 1)
+
 (define (set-color! color)
   (send dc set-pen (send the-pen-list find-or-create-pen color 4 'solid 'round)))
 ; Make a frame by instantiating the frame% class
@@ -169,14 +176,14 @@
               (define yid (scale (yID switch)))
               (define sid (sID switch))
               (send dc set-text-foreground "black")
-							;(send dc draw-text sid (+ 4 xid) (+ yid 4)) ; Is zelfde als de node
+              ;(send dc draw-text sid (+ 4 xid) (+ yid 4)) ; Is zelfde als de node
               (set-color! "black")
               (send dc draw-line x1 y1 xid yid)
               (send dc draw-line x2 y2 xid yid)
               (send dc draw-line x3 y3 xid yid)
-							(send dc set-text-foreground "black")
+              (send dc set-text-foreground "black")
               (send dc draw-text (number->string (get-switch-position sid)) (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
-							)
+              )
             switches))
 (define (draw-locos infrabel)
   (define locos (get-locomotives infrabel))
@@ -193,8 +200,9 @@
               (when (not (cadr loco))
                 (send msg set-label "Not all locs on dt")))
             locos))
-(define (draw-all infrabel)
+(define (draw-all infrabel NMBS)
   (set! infra infrabel)
+  (set! nmbs NMBS)
   (send dc clear)
   (draw-switches)
   (draw-dt infrabel)
@@ -213,40 +221,50 @@
 (define btn-panel (new horizontal-panel% [parent train-frame]
                        [min-height 40] [stretchable-height #f]))
 (define (train-field-list)
-  (define loco-list '())
-  (hash-for-each
-   (rwm-ls railwaymodel)
-   (lambda (id loco)
-     (set! loco-list (cons (string-append "Train " (number->string (loco 'get-id))) loco-list))))
+  (define loco-list (build-list (hash-count (rwm-ls railwaymodel)) values))
+  (set! loco-list (map (lambda (number)
+                         (number->string (+ number 1)))
+                       loco-list))
+  (set! train-choice (car loco-list))
   loco-list)
 (define train-choice-list (train-field-list))
-(define chosen-train (car train-choice-list))
-(define trains-field (new combo-field%
+
+(define (train-choice-callback choice)
+  (set! train-choice choice))
+
+(define trains-field (new choice%
                           (label "Choose train")
                           (parent btn-panel)
                           (choices train-choice-list)
-                          (init-value (car train-choice-list))
-                          ))
+                          (callback (lambda (c e)
+                                      (train-choice-callback (+ 1 (send c get-selection))) ; + 1 because the first train is 1
+                                      ))))
 (define (dt-field-list)
-  (define dt-list '())
-  (hash-for-each
-   (rwm-dt railwaymodel)
-   (lambda (id dt)
-     (set! dt-list (cons (string-append "Detectiontrack " (number->string (dt 'get-id))) dt-list))))
+  (define dt-list (build-list (hash-count (rwm-dt railwaymodel)) values))
+  (set! dt-list (map (lambda (number)
+                       (number->string (+ number 1)))
+                     dt-list))
+  (set! dt-choice (car dt-list))
   dt-list)
+
 (define dt-choice-list (dt-field-list))
-(define dt-field (new combo-field%
+
+(define (dt-choice-callback choice)
+  (set! dt-choice choice))
+
+(define dt-field (new choice%
                       (label "Choose detectiontrack")
                       (parent btn-panel)
                       (choices dt-choice-list)
-                      (init-value (car dt-choice-list))
-                      ))
-
+                      (callback (lambda (c e)
+                                  (dt-choice-callback (+ 1 (send c get-selection))) ; + 1 because the first dt is 1
+                                  ))))
 (new button% [parent btn-panel]
      [label "Drive"]
      ; Callback procedure for a button click:
-     [callback (lambda (button event)
-                 (send msg set-label "Button click"))]) ; Hier de geselecteerde trein laten rijden
+     (callback (lambda (button event)
+                 (displayln train-choice)
+                 ((nmbs 'schedule-destination!) (string->number train-choice) dt-choice)))) ; Hier de geselecteerde trein laten rijden
 
 
 ; Derive a new canvas (a drawing window) class to handle events
