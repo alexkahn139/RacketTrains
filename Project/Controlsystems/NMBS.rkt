@@ -17,13 +17,13 @@
 
   (define planner (make-rwm-to-graph))
 
-  (define (print-status) ; Not really needed, the GUI shows it all
+  (define (print-status occupied-list) ; Not really needed, the GUI shows it all
     (hash-for-each (rwm-dt railwaymodel)
                    (lambda (id detection-track)
                      (display "Detection track: ")
                      (display (detection-track 'get-id))
                      (display ": Is free ")
-                     (display (detection-track 'free?))
+                     (display (list-ref occupied-list (- id 1)))
                      (newline)))
     (for-each
      (lambda (track)

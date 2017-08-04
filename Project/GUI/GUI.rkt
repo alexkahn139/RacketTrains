@@ -32,6 +32,11 @@
 (define train-choice 1)
 (define dt-choice 1)
 
+(define (search-in-list id list)
+  (cond ((null? list) (error "Not in list"))
+        ((eq? id (caar list)) (cdar list))
+        (else (search-in-list id (cdr list)))))
+
 (define (set-color! color)
   (send dc set-pen (send the-pen-list find-or-create-pen color 4 'solid 'round)))
 
@@ -72,7 +77,7 @@
    (rwm-ts railwaymodel))
   track-list)
 
-(define (get-dt infrabel)
+(define (get-dt occupied-list)
   (define dt-list '())
   (hash-for-each
    (rwm-dt railwaymodel)
@@ -85,7 +90,7 @@
           (x2 (node2 'get-x))
           (y2 (node2 'get-y))
           (id (dt 'get-id))
-          (occupied? ((infrabel 'get-light) dt)))
+          (occupied? (search-in-list id occupied-list)))
        (set! dt-list (cons (list x1 y1 x2 y2 (number->string id) occupied?) dt-list)))))
   dt-list)
 
@@ -110,14 +115,14 @@
        (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (switch 'get-id)) switch-list)))))
   switch-list)
 
-(define (get-locomotives infrabel)
+(define (get-locomotives loc-list)
   (define loco-list '())
   (hash-for-each
    (rwm-ls railwaymodel)
    (lambda (id loco)
      (let*
          ((idl (loco 'get-id))
-          (det-id ((infrabel 'get-locomotive-location) idl))
+          (det-id (search-in-list id loc-list))
           (dt #f)
           )
        (when det-id
@@ -149,8 +154,8 @@
               (send dc draw-line x1 y1 x2 y2))
             tracks))
 
-(define (draw-dt infrabel)
-  (define dts (get-dt infrabel))
+(define (draw-dt occupied-list)
+  (define dts (get-dt occupied-list))
   (for-each (lambda (dt)
               (define x1 (scale (x1t dt)))
               (define x2 (scale (x2t dt)))
@@ -188,8 +193,8 @@
               )
             switches))
 
-(define (draw-locos infrabel)
-  (define locos (get-locomotives infrabel))
+(define (draw-locos loco-list)
+  (define locos (get-locomotives loco-list))
   (for-each (lambda (loco)
               (define id (car loco))
               (when (cadr loco)
@@ -203,14 +208,16 @@
             locos))
 
 (define (draw-all infrabel NMBS) ; Get's called to draw all the parts
+  (define occupied-list ((infrabel 'get-all-dt)))
+  (define loco-list ((infrabel 'get-all-loco)))
   (set! infra infrabel)
   (set! nmbs NMBS)
   (send dc clear)
   (draw-switches)
-  (draw-dt infrabel)
+  (draw-dt occupied-list)
   (draw-tracks)
   (draw-nodes)
-  (draw-locos infrabel))
+  (draw-locos loco-list))
 
 
 ; Make a button in the frame

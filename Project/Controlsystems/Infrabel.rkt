@@ -135,6 +135,20 @@
             (loop max-speed (cdr schedule)))))
     (loop loco-speed schedule))
 
+  (define (get-all-dt) ; On the n-1 location in the list you get the occupancy
+    (define occupied '())
+    (hash-for-each (rwm-dt railwaymodel)
+      (lambda (id dt)
+        (set! occupied (cons (cons id (get-light dt)) occupied))))
+    (reverse occupied))
+
+  (define (get-all-loco) ; On the n-1 location in the list you find the location or #f
+    (define loco-list '())
+    (hash-for-each (rwm-ls railwaymodel)
+      (lambda (id ls)
+        (set! loco-list (cons (cons id (get-locomotive-location (ls 'get-id))) loco-list))))
+    (reverse loco-list))
+
   (define (dispatch msg)
     (cond
       ((eq? msg 'update) update)
@@ -143,6 +157,8 @@
       ((eq? msg 'get-locomotive-location) get-locomotive-location)
       ((eq? msg 'get-switch-state) get-switch-state)
       ((eq? msg 'get-light) get-light)
+      ((eq? msg 'get-all-dt) get-all-dt)
+      ((eq? msg 'get-all-loco) get-all-loco)
       ; Setters
       ((eq? msg 'set-switch-state!) set-switch-state!)
 
