@@ -22,12 +22,18 @@
 (set-up-server infrabel port)
 (set-up-listener port)
 
-(define (main)
+(define (infra-loop)
+  (sleep 0.02)
   ((infrabel 'update))
+  (infra-loop))
+
+(define (nmbs-loop)
   (sleep 0.02)
   (draw-all NMBS)
   (when loop
-    (main)))
+    (nmbs-loop)))
 
 (when loop
-  (thread main))
+  (thread nmbs-loop)
+  (thread infra-loop)
+  )
