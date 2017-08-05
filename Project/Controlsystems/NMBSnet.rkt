@@ -8,8 +8,8 @@
 (require "../Abstractions.rkt")
 
 
-(provide client
-				 translate)
+(provide get-all
+				 set-up-listener)
 
 ; http://www.cs.utah.edu/plt/mailarch/plt-scheme-2002/msg00955.html, helped me out a lot to start up the server side of things
 (require racket/tcp)
@@ -23,15 +23,12 @@
 		(write message me->server)
 		(close-output-port me->server)
 		(let ([response (read server->me)])
-        (display response) (newline)
         (close-input-port server->me)
-				response)))
+				(translate response))))
 
 (define (translate response)
 	(set! response (string-split response))
 	(set! response (cdr response)) ; The denomifier is not needed here
-	(displayln response)
-	(displayln (car response))
 	(define output '())
 	(define (translate-loop list) ; Takes the list of responses
 		(if (null? list)
@@ -40,3 +37,9 @@
 					(set! output (cons (cons (string-to-id (car list)) (string-to-number (car list))) output))
 					(translate-loop (cdr list)))))
 	(translate-loop response))
+
+(define (get-all msg)
+	(client msg))
+
+(define (set-up-listener port)
+	(set! SERVICE-PORT port))

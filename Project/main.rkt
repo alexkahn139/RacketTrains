@@ -16,13 +16,16 @@
 (define infrabel (make-infrabel))
 (define NMBS (make-nmbs infrabel))
 (define loop #t)
-(set-up-server infrabel)
+;(define port (random 2000 65535)) (display port)
+(define port 29486)
+
+(set-up-server infrabel port)
+(set-up-listener port)
 
 (define (main)
   ((infrabel 'update))
-  (draw-all infrabel NMBS)
-  
   (sleep 0.02)
+  (draw-all NMBS)
   (when loop
     (main)))
 

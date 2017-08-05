@@ -7,7 +7,7 @@
 
 (require "../ADT/RailwayModel.rkt")
 (require "../Abstractions.rkt")
-(require "../Controlsystems/Infrabel.rkt")
+(require "../Controlsystems/NMBSnet.rkt")
 (require "../Simulator/interface.rkt")
 
 
@@ -207,9 +207,9 @@
                 (send dc draw-bitmap locomotive (/ (+ x1 x2) 2) (/ (+ y1 y2) 2))))
             locos))
 
-(define (draw-all infrabel NMBS) ; Get's called to draw all the parts
-  (define occupied-list ((infrabel 'get-all-dt)))
-  (define loco-list ((infrabel 'get-all-loco)))
+(define (draw-all NMBS) ; Get's called to draw all the parts
+  (define occupied-list (get-all 'get-all-dt))
+  (define loco-list (get-all 'get-all-loco))
   ;(set! infra infrabel)
   (set! nmbs NMBS)
   (send dc clear)

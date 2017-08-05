@@ -68,7 +68,8 @@
       (loop))
     (loop)))
 
-(define (set-up-server infra)
+(define (set-up-server infra port)
+  (set! SERVICE-PORT port)
   (set! server-up #t)
   (set! infrabel infra)
   (set! listen-thread (thread server)))
