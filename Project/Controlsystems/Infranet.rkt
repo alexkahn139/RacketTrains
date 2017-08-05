@@ -22,8 +22,14 @@
 
 ; Stringifier, om nuttige informatie in een string te duwen
 (define (stringify denomifier list)
+  (define (number-or-bool-to-string input)
+    (if (number? input)
+        (number->string input)
+        (if input
+            "true"
+            "false")))
   (define (car-and-cdr-to-string cons-cell)
-    (string-append (if (number? (car cons-cell)) (number->string (car cons-cell)) "false") " " (if (number? (cdr cons-cell))(number->string (cdr cons-cell)) "false")))
+    (string-append (number-or-bool-to-string (car cons-cell)) " " (number-or-bool-to-string (cdr cons-cell)) " "))
   (define (list-to-string list string)
     (if (null? list)
         string
@@ -49,11 +55,12 @@
                     (tcp-accept listener)])
         ; Hier conditional, voor al de mogelijke inkomende boodschappen
         (let ((message "msg not understood"))
+          (define msg (read client->me))
           (cond
             ; Post commands
-            ((eq? (read client->me) 'get-all-dt) (set! message (stringify 'dt ((infrabel 'get-all-dt)))))
-            ((eq? (read client->me) 'get-all-loco) (set! message (stringify 'locomotive ((infrabel 'get-all-loco)))))
-            ((eq? (read client->me) 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
+            ((eq? msg 'get-all-dt) (set! message (stringify 'dt ((infrabel 'get-all-dt)))))
+            ((eq? msg 'get-all-loco) (set! message (stringify 'locomotive ((infrabel 'get-all-loco)))))
+            ((eq? msg 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
             ; Put commands
             ; Need to find a way, to split the msg and the args
             )
