@@ -38,28 +38,29 @@
   (set! output (string-append (list-to-string list output)))
   output)
 
-(define (server infrabel)
-  (let ([listener (tcp-listen SERVICE-PORT)])
-    (let loop ()
-      (let-values ([(client->me me->client)
-                    (tcp-accept listener)])
-        ; Hier conditional, voor al de mogelijke inkomende boodschappen
-        (let ((message "msg not understood"))
-          (cond
-            ; Post commands
-            ((eq? (read client->me) 'get-all-dt) (set! message (stringify 'dt ((infrabel 'get-all-dt)))))
-            ((eq? (read client->me) 'get-all-loco) (set! message (stringify 'locomotive ((infrabel 'get-all-loco)))))
-            ((eq? (read client->me) 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
-            ; Put commands
-            ; Need to find a way, to split the msg and the args
-            )
-          (close-input-port client->me)
-          (write message me->client)
-          (close-output-port me->client)))
-      (when server-up (loop)))))
+(define (server)
+  (lambda ()
+    (let ([listener (tcp-listen SERVICE-PORT)])
+      (let loop ()
+        (let-values ([(client->me me->client)
+                      (tcp-accept listener)])
+          ; Hier conditional, voor al de mogelijke inkomende boodschappen
+          (let ((message "msg not understood"))
+            (cond
+              ; Post commands
+              ((eq? (read client->me) 'get-all-dt) (set! message (stringify 'dt ((infrabel 'get-all-dt)))))
+              ((eq? (read client->me) 'get-all-loco) (set! message (stringify 'locomotive ((infrabel 'get-all-loco)))))
+              ((eq? (read client->me) 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
+              ; Put commands
+              ; Need to find a way, to split the msg and the args
+              )
+            (close-input-port client->me)
+            (write message me->client)
+            (close-output-port me->client)))
+        (when server-up (loop))))))
 
 (define (set-up-server infra)
   (set! server-up #t)
   (set! infrabel infra)
   (when server-up
-    (thread server infrabel)))
+    (thread server)))
