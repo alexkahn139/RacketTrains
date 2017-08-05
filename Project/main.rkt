@@ -14,7 +14,7 @@
 
 
 (define infrabel (make-infrabel))
-(define NMBS (make-nmbs infrabel))
+(define NMBS (make-nmbs))
 (define loop #t)
 ;(define port (random 2000 65535)) (display port)
 (define port 29486)

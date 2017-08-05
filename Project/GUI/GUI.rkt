@@ -16,11 +16,8 @@
 (provide
  draw-all)
 
-;(define railwaymodel (load-rwm "be_simple.txt"))
-;(define infra '())
 (define nmbs '())
 (define train-list '())
-;(define infrabel (make-infrabel))
 
 
 
@@ -210,7 +207,6 @@
 (define (draw-all NMBS) ; Get's called to draw all the parts
   (define occupied-list (get-all 'get-all-dt))
   (define loco-list (get-all 'get-all-loco))
-  ;(set! infra infrabel)
   (set! nmbs NMBS)
   (send dc clear)
   (draw-switches)

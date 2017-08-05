@@ -24,6 +24,7 @@
 	sID
 	string-to-id
 	string-to-number
+	location-in-list
 	)
 
 (define current-node car)
@@ -69,3 +70,6 @@
 		((string=? "f" (substring str 2 3)) #f)
 		((string=? "t" (substring str 2 3)) #t)
 		(else (string->number (substring str 2 3)))))
+
+(define (location-in-list id list)
+	(cdar (filter (lambda (cc) (eq? (car cc) id)) list)))
