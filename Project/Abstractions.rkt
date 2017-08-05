@@ -22,6 +22,8 @@
 	xID
 	yID
 	sID
+	string-to-id
+	string-to-number
 	)
 
 (define current-node car)
@@ -58,3 +60,12 @@
 
 	(define (sID switch)
 		(cadddr (cddddr (cdr switch))))
+
+(define (string-to-id str)
+	(string->number (substring str 0 1)))
+
+(define (string-to-number str)
+	(cond
+		((string=? "f" (substring str 2 3)) #f)
+		((string=? "t" (substring str 2 3)) #t)
+		(else (string->number (substring str 2 3)))))

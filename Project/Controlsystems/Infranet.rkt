@@ -29,7 +29,7 @@
             "true"
             "false")))
   (define (car-and-cdr-to-string cons-cell)
-    (string-append (number-or-bool-to-string (car cons-cell)) " " (number-or-bool-to-string (cdr cons-cell)) " "))
+    (string-append (number-or-bool-to-string (car cons-cell)) "-" (number-or-bool-to-string (cdr cons-cell)) " "))
   (define (list-to-string list string)
     (if (null? list)
         string
@@ -37,9 +37,9 @@
   (define output '())
   ; The first letter of the string is the denomifier
   (cond
-    ((eq? denomifier 'locomotive) (set! output "L :"))
-    ((eq? denomifier 'dt) (set! output "D :"))
-    ((eq? denomifier 'switch) (set! output "S :"))
+    ((eq? denomifier 'locomotive) (set! output "L "))
+    ((eq? denomifier 'dt) (set! output "D "))
+    ((eq? denomifier 'switch) (set! output "S "))
     (else (error "Denomifier not known - " denomifier))
     )
   ; The list should also be added to the string
@@ -48,9 +48,7 @@
 
 (define (server)
   (let ([listener (tcp-listen SERVICE-PORT)])
-    (displayln "Server up")
     (define (loop)
-      (displayln "Server still up")
       (let-values ([(client->me me->client)
                     (tcp-accept listener)])
         ; Hier conditional, voor al de mogelijke inkomende boodschappen
