@@ -10,16 +10,18 @@
 (require "../Project/GUI/GUI.rkt")
 (require "../Project/ADT/RailwayModel.rkt")
 (require "../Project/Controlsystems/Infranet.rkt")
+(require "../Project/Controlsystems/NMBSnet.rkt")
 
 
 (define infrabel (make-infrabel))
 (define NMBS (make-nmbs infrabel))
 (define loop #t)
+(set-up-server infrabel)
 
 (define (main)
   ((infrabel 'update))
   (draw-all infrabel NMBS)
-	(set-up-server infrabel)
+  
   (sleep 0.02)
   (when loop
     (main)))
