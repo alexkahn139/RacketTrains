@@ -7,7 +7,7 @@
 
 (require "../ADT/RailwayModel.rkt")
 (require "../Abstractions.rkt")
-(require "../a-d/graph/unweighted/config.rkt")
+(require "../a-d/graph/labeled/config.rkt")
 (require "../a-d/graph-algorithms/undirected/bft-applications.rkt")
 
 (provide make-rwm-to-graph)
@@ -42,8 +42,8 @@
   ;; For the calculation of a path, it shouldn't matter if the edge is a track,
   ;; detection track or switch. Each edge should be between to nodes
 
-  (define (add-track! node1 node2)
-    (add-edge! node-graph node1 node2))
+  (define (add-track! node1 node2 label)
+    (add-edge! node-graph node1 node2 label))
 
   (define (delete-track! node1 node2)
     (delete-edge! node-graph node1 node2))
@@ -56,7 +56,7 @@
        (let*
            ((node1 (hash-ref node-dict (dt 'get-node1)))
             (node2 (hash-ref node-dict (dt 'get-node2))))
-         (add-track! node1 node2))))
+         (add-track! node1 node2 'dt))))
     (hash-for-each
      (rwm-ss railwaymodel)
      (lambda (id ss)
@@ -65,15 +65,15 @@
             (node2 (hash-ref node-dict (ss 'get-node2)))
             (node3 (hash-ref node-dict (ss 'get-node3)))
             )
-         (add-track! node1 node2)
-         (add-track! node1 node3))))
+         (add-track! node1 node2 'ss)
+         (add-track! node1 node3 'ss))))
 
     (for-each
      (lambda (track)
        (let*
            ((node1 (hash-ref node-dict (track 'get-node1)))
             (node2 (hash-ref node-dict (track 'get-node2))))
-         (add-track! node1 node2)))
+         (add-track! node1 node2 't)))
      (rwm-ts railwaymodel))
     )
 

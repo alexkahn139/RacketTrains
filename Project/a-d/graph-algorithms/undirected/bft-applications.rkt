@@ -16,28 +16,28 @@
  (basic algorithms)
  (export shortest-path distance)
  (import (rnrs base)
-         (a-d graph unweighted config)
-         (a-d graph-traversing bft))
- 
+         (a-d graph labeled config)
+         (a-d graph-traversing bft-labeled))
+
  (define (shortest-path g from to)
    (define paths (make-vector (order g) '()))
    (vector-set! paths from (list from))
-   (bft g 
+   (bft g
         root-nop
-        (lambda (node) 
+        (lambda (node label) ; Needed changes to work with labels
           (not (eq? node to)))
-        (lambda (from to)
+        (lambda (from to edge-label) ; Needed changes to work with labels
           (vector-set! paths to (cons to (vector-ref paths from))))
         edge-nop
         (list from))
    (vector-ref paths to))
- 
+
  (define (distance g from to)
    (define distances (make-vector (order g) +inf.0))
    (vector-set! distances from 0)
-   (bft g 
+   (bft g
         root-nop
-        (lambda (node) 
+        (lambda (node)
           (not (eq? node to)))
         (lambda (from to)
           (vector-set! distances to (+ (vector-ref distances from) 1)))
