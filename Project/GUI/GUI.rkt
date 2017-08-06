@@ -5,7 +5,7 @@
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require "../ADT/RailwayModel.rkt")
+(require "../ADT/GraphRWM.rkt")
 (require "../Abstractions.rkt")
 (require "../Controlsystems/NMBSnet.rkt")
 (require "../Simulator/interface.rkt")
@@ -71,14 +71,13 @@
           (x2 (node2 'get-x))
           (y2 (node2 'get-y)))
        (set! track-list (cons (list x1 y1 x2 y2) track-list))))
-   (rwm-ts railwaymodel))
+   (all-tracks))
   track-list)
 
 (define (get-dt occupied-list)
   (define dt-list '())
-  (hash-for-each
-   (rwm-dt railwaymodel)
-   (lambda (id dt)
+  (for-each
+   (lambda (dt)
      (let*
          ((node1 (hash-ref (rwm-ns railwaymodel) (dt 'get-node1)))
           (node2 (hash-ref (rwm-ns railwaymodel) (dt 'get-node2)))
@@ -88,14 +87,14 @@
           (y2 (node2 'get-y))
           (id (dt 'get-id))
           (occupied? (search-in-list id occupied-list)))
-       (set! dt-list (cons (list x1 y1 x2 y2 (number->string id) occupied?) dt-list)))))
+       (set! dt-list (cons (list x1 y1 x2 y2 (number->string id) occupied?) dt-list))))
+   (all-dt))
   dt-list)
 
 (define (get-switches)
   (define switch-list '())
-  (hash-for-each
-   (rwm-ss railwaymodel)
-   (lambda (id switch)
+  (for-each
+   (lambda (switch)
      (let*
          ((node1 (hash-ref (rwm-ns railwaymodel) (switch 'get-node1)))
           (node2 (hash-ref (rwm-ns railwaymodel) (switch 'get-node2)))
@@ -109,7 +108,8 @@
           (y3 (node3 'get-y))
           (idx (id 'get-x))
           (idy (id 'get-y)))
-       (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (switch 'get-id)) switch-list)))))
+       (set! switch-list (cons (list x1 y1 x2 y2 x3 y3 idx idy (switch 'get-id)) switch-list))))
+   (all-switches))
   switch-list)
 
 (define (get-locomotives loc-list)
@@ -123,7 +123,7 @@
           (dt #f)
           )
        (when det-id
-         (set! dt (hash-ref (rwm-dt railwaymodel) det-id)))
+         (set! dt (find-dt det-id)))
        (set! loco-list (cons (list id dt) loco-list)))))
   loco-list)
 
@@ -195,8 +195,8 @@
   (for-each (lambda (loco)
               (define id (car loco))
               (when (cadr loco)
-                (define node1 (hash-ref (rwm-ns railwaymodel) ((cadr loco) 'get-node1)))
-                (define node2 (hash-ref (rwm-ns railwaymodel) ((cadr loco) 'get-node2)))
+                (define node1 (hash-ref (rwm-ns railwaymodel) ((caadr loco) 'get-node1)))
+                (define node2 (hash-ref (rwm-ns railwaymodel) ((caadr loco) 'get-node2)))
                 (define x1 (scale (node1 'get-x)))
                 (define x2 (scale (node2 'get-x)))
                 (define y1 (scale (node1 'get-y)))
@@ -242,7 +242,7 @@
                                       (train-choice-callback (+ 1 (send c get-selection))) ; + 1 because the first train is 1
                                       ))))
 (define (dt-field-list)
-  (define dt-list (build-list (hash-count (rwm-dt railwaymodel)) values))
+  (define dt-list (build-list (length (all-dt)) values))
   (set! dt-list (map (lambda (number)
                        (number->string (+ number 1)))
                      dt-list))
