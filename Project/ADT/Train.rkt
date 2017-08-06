@@ -18,11 +18,14 @@
 	(define next-detection-track '())
 
   (define (set-schedule! schedule-list)
-    (set! next-detection-track (get-loco-detection-block id))
+    (if (> (length schedule-list) 2)
+        (set-next-detection-track! (car schedule-list) (cadr schedule-list))
+        (set! next-detection-track '()))
     (set! schedule schedule-list))
 
-	(define (set-next-detection-track! dt-id)
-		(set! next-detection-track dt-id))
+	(define (set-next-detection-track! node1 node2)
+    (displayln "set-next-detection-track")
+		(set! next-detection-track (cons node1 node2)))
 
   (define (set-direction! dir)
     (set! direction dir))

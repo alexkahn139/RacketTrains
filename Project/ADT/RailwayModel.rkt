@@ -14,9 +14,9 @@
 (provide (struct-out rwm)
          load-rwm
          get-track
-         track-eqv?
-         get-dt
-         get-switch
+         ;track-eqv?
+         ;get-dt
+         ;get-switch
          find-railwaypiece
          find-train
          railwaymodel

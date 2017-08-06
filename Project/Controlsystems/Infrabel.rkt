@@ -5,7 +5,7 @@
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require "../ADT/RailwayModel.rkt")
+(require "../ADT/GraphRWM.rkt")
 (require "../Simulator/interface.rkt")
 (require "../Abstractions.rkt")
 
@@ -34,7 +34,7 @@
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
                                            ;(prepare-tracks train)
                                            (define next-dt (train 'get-next-dt))
-                                           (when (eq? next-dt (get-locomotive-location (train 'get-id)))
+                                           (when (and (pair? next-dt) (eq? (find-railwaypiece (car next-dt) (cdr next-dt)) (get-locomotive-location (train 'get-id))))
                                              (define schedule (train 'get-schedule))
                                              (fix-schedule train next-dt schedule)
                                              (fix-switches schedule)
@@ -62,10 +62,11 @@
     (when (not (null? schedule))
       (begin
         (let*
-            ((next-dt (train 'get-next-dt))
-             (det (hash-ref (rwm-dt railwaymodel) next-dt)))
-          (cond ((eq? ((find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule))) 'get-id)  (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
-                ((and (not (eq? next-dt (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0)) ; If there is another train, the train stops
+            ((next-dt (train 'get-next-dt)) ; next-dt should be a list with the two nodes
+             (det (find-railwaypiece (car next-dt) (cdr next-dt)))
+             (last-dt (find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule)))))
+          (cond ((eq? (last-dt 'get-id) (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
+                ;((and (not (eq? (det 'get-id) (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0)) ; If there is another train, the train stops
                 (else (set-loco-speed! (train 'get-id) (calculate-train-movement train))))))))
 
   (define (fix-schedule train next-dt rest-schedule) ; Function to delete te part of the schedule that's already driven
@@ -80,7 +81,7 @@
       (when (> (length rst-sched) 2)
         (define track (find-railwaypiece (car rst-sched) (cdr rst-sched)))
         (if (and track (eq? 'detectiontrack (track 'get-type)))
-            ((train 'set-next-dt!) track)
+            ((train 'set-next-dt!) (cons (car rst-sched) (cdr rst-sched)))
             (find-loop (cdr rst-sched)))))
     (find-loop schedule))
 
@@ -89,14 +90,14 @@
     (define (set-loop rst-sched)
       (when (> (length rst-sched) 2)
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
-				(define pos-track (find-railwaypiece (cadr rst-sched) (caddr rst-sched)))
+        (define pos-track (find-railwaypiece (cadr rst-sched) (caddr rst-sched)))
         (when (and track (eq? 'switch (track 'get-type)))
           (calculate-switch track (car rst-sched) (cadr rst-sched)))
-				(when (and track pos-track (eq? 'switch (track 'get-type)) (eq? 'switch (pos-track 'get-type))) ; Needed for when there is a double switch, otherwise the ID never gets found
-					(let* ((nodeA (track 'get-id))
-								 (nodeB (pos-track 'get-id))
-								 (new-track (find-railwaypiece nodeA nodeB)))
-					(calculate-switch new-track nodeA nodeB)))
+        (when (and track pos-track (eq? 'switch (track 'get-type)) (eq? 'switch (pos-track 'get-type))) ; Needed for when there is a double switch, otherwise the ID never gets found
+          (let* ((nodeA (track 'get-id))
+                 (nodeB (pos-track 'get-id))
+                 (new-track (find-railwaypiece nodeA nodeB)))
+            (calculate-switch new-track nodeA nodeB)))
         (set-loop (cdr rst-sched))))
     (set-loop schedule))
 
@@ -107,12 +108,12 @@
     (define n3 (switch 'get-node3))
     (cond ((and (eqv? n1 nA) (eqv? n2 nB))
            (set-switch-state! id 1)) ; Then nB is equal to n3
-        	((and (eqv? n1 nA) (eqv? n3 nB))
-					 (set-switch-state! id 2))
-					((and (eqv? n1 nB) (eqv? n2 nA))
-					 (set-switch-state! id 1))
-					((and (eqv? n1 nB) (eqv? n3 nA))
- 					 (set-switch-state! id 2))))
+          ((and (eqv? n1 nA) (eqv? n3 nB))
+           (set-switch-state! id 2))
+          ((and (eqv? n1 nB) (eqv? n2 nA))
+           (set-switch-state! id 1))
+          ((and (eqv? n1 nB) (eqv? n3 nA))
+           (set-switch-state! id 2))))
 
   (define (calculate-direction train nodeA nodeB)
     (define track (find-railwaypiece nodeA nodeB))
@@ -123,7 +124,7 @@
   (define (calculate-train-movement train)
     (define schedule (train 'get-schedule))
     (define loco-speed (train 'get-max-speed))
-		(calculate-direction train (car schedule) (cadr schedule))
+    (calculate-direction train (car schedule) (cadr schedule))
     (define (loop max-speed schedule)
       (let*
           ((current (current-node schedule))
@@ -131,22 +132,22 @@
            (track (find-railwaypiece current next)))
         (set! max-speed (min max-speed loco-speed (track 'get-max-speed)))
         (if (< (length (cdr schedule)) 2)
-						(* (train 'get-direction) max-speed)
+            (* (train 'get-direction) max-speed)
             (loop max-speed (cdr schedule)))))
     (loop loco-speed schedule))
 
   (define (get-all-dt) ; On the n-1 location in the list you get the occupancy
     (define occupied '())
-    (hash-for-each (rwm-dt railwaymodel)
-      (lambda (id dt)
-        (set! occupied (cons (cons id (get-light dt)) occupied))))
+    (for-each
+     (lambda (dt)
+       (set! occupied (cons (cons (dt 'get-id) (get-light dt)) occupied))) (all-dt))
     (reverse occupied))
 
   (define (get-all-loco) ; On the n-1 location in the list you find the location or #f
     (define loco-list '())
     (hash-for-each (rwm-ls railwaymodel)
-      (lambda (id ls)
-        (set! loco-list (cons (cons id (get-locomotive-location (ls 'get-id))) loco-list))))
+                   (lambda (id ls)
+                     (set! loco-list (cons (cons id (get-locomotive-location (ls 'get-id))) loco-list))))
     (reverse loco-list))
 
   (define (dispatch msg)

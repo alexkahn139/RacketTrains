@@ -22,7 +22,7 @@
  (import (rnrs base)
          (rnrs control)
          (rnrs mutable-pairs)
-         ;(a-d graph labeled adjacency-matrix)
+         ;(a-d graph labeled adjacency-matrix) ;; for-each-edge is used a lot so better this one
          (a-d graph labeled adjacency-list) ;As exercise!
          )
  )

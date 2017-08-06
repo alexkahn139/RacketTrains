@@ -23,14 +23,14 @@
          (srfi :9)
          (rnrs control)
          (rnrs mutable-pairs))
- 
+
  (define-record-type labeled-graph
    (make d n s)
    labeled-graph?
    (d directed?)
    (n nr-of-edges nr-of-edges!)
    (s storage))
- 
+
  (define (new directed order)
    (make directed
          0 ; nr-of-edges
@@ -41,10 +41,10 @@
              (if (< i order)
                  (fill-row (+ i 1))
                  rows)))))
-  
+
  (define (order graph)
    (vector-length (storage graph)))
- 
+
  (define (for-each-node graph proc)
    (define rows (storage graph))
    (let iter-nodes
@@ -53,7 +53,7 @@
      (if (< (+ i 1) (order graph))
          (iter-nodes (+ i 1))))
    graph)
- 
+
  (define (for-each-edge graph node proc)
    (define rows (storage graph))
    (let iter-edges
@@ -64,16 +64,16 @@
      (if (< (+ to 1) (order graph))
          (iter-edges (+ to 1) (vector-ref (cdr (vector-ref rows node)) (+ to 1)))))
    graph)
- 
+
  (define (label! graph node label)
    (define rows (storage graph))
    (set-car! (vector-ref rows node) label)
    graph)
- 
+
  (define (label graph node)
    (define rows (storage graph))
    (car (vector-ref rows node)))
- 
+
  (define (add-edge! graph from to label)
    (define rows (storage graph))
    (vector-set! (cdr (vector-ref rows from)) to label)
@@ -81,7 +81,7 @@
      (vector-set! (cdr (vector-ref rows to)) from label)
      (nr-of-edges! graph (+ 1 (nr-of-edges graph))))
    graph)
- 
+
  (define (delete-edge! graph from to)
    (define rows (storage graph))
    (vector-set! (cdr (vector-ref rows from)) to 'no-label)
@@ -89,14 +89,15 @@
      (vector-set! (cdr (vector-ref rows to)) from 'no-label)
      (nr-of-edges! graph (- (nr-of-edges graph) 1)))
    graph)
- 
+
  (define (adjacent? graph from to)
    (define rows (storage graph))
    (define row (cdr (vector-ref rows from)))
    (not (eq? (vector-ref row to) 'no-label)))
- 
+
  (define (edge-label graph from to)
    (define rows (storage graph))
    (if (eq? (vector-ref (cdr (vector-ref rows from)) to) 'no-label)
        #f
-       (vector-ref (cdr (vector-ref rows from)) to))))
+       (vector-ref (cdr (vector-ref rows from)) to)))
+ )
