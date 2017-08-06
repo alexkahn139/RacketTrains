@@ -208,7 +208,7 @@
   (define occupied-list (get-all 'get-all-dt))
   (define loco-list (get-all 'get-all-loco))
   (set! nmbs NMBS)
-  (send dc clear)
+  (send dc erase)
   (draw-switches)
   (draw-dt occupied-list)
   (draw-tracks)

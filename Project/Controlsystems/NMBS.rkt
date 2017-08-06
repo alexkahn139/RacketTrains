@@ -42,9 +42,10 @@
   (define (schedule-destination! train-id destination) ; Need the ID of the train and the destination
     (define train (find-train train-id))
     (define location (location-in-list train-id (get-all 'get-all-loco)))
-    (define path ((planner 'calculate-path) location destination)) ; Met de grafalgorithmen hier de korste weg berekenen
-    ((train 'set-schedule!) path)
-		(displayln path))
+    (define path ((planner 'calculate-path) location destination))
+    (if (eq? location destination)
+        (error "Train already on destination")
+        ((train 'set-schedule!) path)))
 
 
   (define (dispatch msg)
