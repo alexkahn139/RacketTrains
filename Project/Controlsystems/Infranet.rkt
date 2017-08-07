@@ -46,6 +46,18 @@
   (set! output (string-append (list-to-string list output)))
   output)
 
+(define (translate-path string)
+  (define path '())
+  (set! string (string-split string))
+  (define train-id (string->number (car string)))
+  (define (path-loop str-list)
+    (when (not (null? str-list))
+      (set! path (cons (string->symbol (car str-list)) path))
+      (path-loop (cdr str-list))))
+  (path-loop (cdr string))
+  ((infrabel 'set-new-destination!) train-id (reverse path))
+  )
+
 (define (server)
   (let ([listener (tcp-listen SERVICE-PORT)])
     (define (loop)
@@ -61,6 +73,10 @@
             ((eq? msg 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
             ; Put commands
             ; Need to find a way, to split the msg and the args
+            (else
+              (begin
+                (translate-path msg)
+                (set! message 'Received-new-path)))
             )
           (close-input-port client->me)
           (write message me->client)

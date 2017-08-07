@@ -28,7 +28,7 @@
       (translate response))))
 
 (define (translate response)
-  (cond ((eq? response "Path added to train") (display response))
+  (cond ((eq? response 'Received-new-path) (display response))
         (else
          (set! response (string-split response))
          (set! response (cdr response)) ; The denomifier is not needed here
@@ -52,7 +52,7 @@
       (set! output (string-append output " " car-string))
       (list-to-string (cdr list))))
   (list-to-string path)
-  (displayln output))
+  (client output))
 
 
 (define (set-up-listener port)

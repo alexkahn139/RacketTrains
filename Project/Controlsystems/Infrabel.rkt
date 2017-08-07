@@ -30,7 +30,7 @@
   (define (clear-schedule train)
     ((train 'set-schedule!) '()))
 
-	(define (set-new-destination train-id path)
+	(define (set-new-destination! train-id path)
 		(define train (find-train train-id))
 		((train 'set-schedule!) path)
 		((train 'set-next-dt!) (car path) (cadr path)))
@@ -184,7 +184,7 @@
       ((eq? msg 'get-all-loco) get-all-loco)
       ; Setters
       ((eq? msg 'set-switch-state!) set-switch-state!)
-
+      ((eq? msg 'set-new-destination!) set-new-destination!)
       (else (error "Unknown message"))
       ))
   (start-simulator)
