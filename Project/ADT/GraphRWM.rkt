@@ -181,9 +181,7 @@
   (define stop-vertex (hash-ref node-dict stop-node))
   (define schedule (reverse (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
   (set! schedule (map real-node schedule)) ; hash-ref is fast if we need to retranslate
-  (displayln schedule)
   (set! schedule (fix-switches schedule block-1 block-2))
-  (displayln schedule)
   (set! schedule (make-usable-path schedule start-block stop-block))
   (flatten schedule))
 
@@ -207,18 +205,15 @@
   ;;; - The path uses the same switch in a row (nB->nA->nC). The solution is to make the train drive another path until a DT
   ;;; - The other problem is when to switches follow each other and the second switch is not detected correctly
   (define (make-detour rest-of-path result-path)
-    (displayln "Make detour")
     (define (neighbours rest-of-path result-path)
       (define (dt-loop node1 prev result)
-        (display prev)
         (define node2 (car (remove prev (find-neighbours node1))))
-        (displayln node2)
         (define track (find-railwaypiece node1 node2))
 
         (set! result (cons node2 result))
 
         (if (eq? 'detection-track (track 'get-type))
-            (begin (displayln (list? result)) result)
+            result
             (dt-loop node2 node1 result)))
       (define node1 (cadr rest-of-path))
       (define prev (car rest-of-path))

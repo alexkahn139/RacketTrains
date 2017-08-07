@@ -34,11 +34,13 @@
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
                                            ;(prepare-tracks train)
                                            (define next-dt (train 'get-next-dt))
-                                           (when (and (pair? next-dt) (eq? (find-railwaypiece (car next-dt) (cdr next-dt)) (get-locomotive-location (train 'get-id))))
-                                             (define schedule (train 'get-schedule))
-                                             (fix-schedule train next-dt schedule)
-                                             (fix-switches schedule)
-                                             (find-next-dt train schedule))
+                                           (when (pair? next-dt)
+                                             (define track  (find-railwaypiece (car next-dt) (cdr next-dt)))
+                                             (when (eq? (track 'get-id) (get-locomotive-location (train 'get-id)))
+                                               (define schedule (train 'get-schedule))
+                                               (fix-schedule train next-dt schedule)
+                                               (fix-switches schedule)
+                                               (find-next-dt train schedule)))
                                            (drive-train train))))
 
   (define (get-light track) ; Returns true, when the light is red
@@ -66,22 +68,24 @@
              (det (find-railwaypiece (car next-dt) (cdr next-dt)))
              (last-dt (find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule)))))
           (cond ((eq? (last-dt 'get-id) (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
-                ;((and (not (eq? (det 'get-id) (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0)) ; If there is another train, the train stops
+                ((and (not (eq? (det 'get-id) (get-locomotive-location (train 'get-id)))) (get-light det)) (set-loco-speed! (train 'get-id) 0)) ; If there is another train, the train stops
                 (else (set-loco-speed! (train 'get-id) (calculate-train-movement train))))))))
 
   (define (fix-schedule train next-dt rest-schedule) ; Function to delete te part of the schedule that's already driven
     (when (> (length rest-schedule) 2)
-      (define testtrack (find-railwaypiece (car rest-schedule) (cdr rest-schedule)))
-      (if (and testtrack (eq? 'detectiontrack (testtrack 'get-type)) (eq? next-dt (testtrack 'get-id)))
+      (define testtrack (find-railwaypiece (car rest-schedule) (cadr rest-schedule)))
+      (if (and testtrack (eq? 'detection-track (testtrack 'get-type)) (eq? next-dt (testtrack 'get-id)))
           ((train 'set-schedule!) (cdr (cdr rest-schedule)))
           (fix-schedule train next-dt (cdr rest-schedule)))))
 
   (define (find-next-dt train schedule)
+		(displayln "Find the next")
     (define (find-loop rst-sched)
       (when (> (length rst-sched) 2)
-        (define track (find-railwaypiece (car rst-sched) (cdr rst-sched)))
-        (if (and track (eq? 'detectiontrack (track 'get-type)))
-            ((train 'set-next-dt!) (cons (car rst-sched) (cdr rst-sched)))
+        (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
+				(displayln (track 'get-type))
+        (if (eq? 'detectiontrack (track 'get-type))
+            ((train 'set-next-dt!) (cons (car rst-sched) (cadr rst-sched)))
             (find-loop (cdr rst-sched)))))
     (find-loop schedule))
 

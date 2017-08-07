@@ -246,7 +246,7 @@
   (set! dt-list (map (lambda (number)
                        (number->string (+ number 1)))
                      dt-list))
-  (set! dt-choice (car dt-list))
+  ;(set! dt-choice (car dt-list))
   dt-list)
 
 (define dt-choice-list (dt-field-list))
