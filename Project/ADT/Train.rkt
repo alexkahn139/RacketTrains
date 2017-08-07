@@ -18,9 +18,9 @@
 	(define next-detection-track '())
 
   (define (set-schedule! schedule-list)
-    (if (> (length schedule-list) 2)
-        (set-next-detection-track! (car schedule-list) (cadr schedule-list))
-        (set! next-detection-track '()))
+    ;(if (> (length schedule-list) 2)
+    ;    (set-next-detection-track! (car schedule-list) (cadr schedule-list))
+    ;    (set! next-detection-track '()))
     (set! schedule schedule-list)
     (displayln schedule))
 

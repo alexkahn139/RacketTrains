@@ -45,7 +45,8 @@
     (define path (calculate-path location destination))
     (if (eq? location destination)
         (error "Train already on destination")
-        ((train 'set-schedule!) path)))
+        (begin ((train 'set-schedule!) path)
+        ((train 'set-next-dt!) (car path) (cadr path)))))
 
 
   (define (dispatch msg)
