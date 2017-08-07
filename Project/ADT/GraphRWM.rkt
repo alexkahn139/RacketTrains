@@ -27,6 +27,7 @@
          all-pieces
          all-switches
          find-dt
+         calculate-path
          )
 
 (struct rwm (ls ns node-graph))
@@ -213,7 +214,7 @@
         (define node2 (car (remove prev (find-neighbours node1))))
         (displayln node2)
         (define track (find-railwaypiece node1 node2))
-      
+
         (set! result (cons node2 result))
 
         (if (eq? 'detection-track (track 'get-type))
