@@ -18,6 +18,7 @@
          add-edge! delete-edge!
          adjacent?
          label label! edge-label
+         graph-edge-to
          )
  (import (srfi :9)
          (rnrs base (6))

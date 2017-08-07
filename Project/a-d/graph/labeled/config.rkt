@@ -16,7 +16,7 @@
  (labeled-graph)
  (export new labeled-graph? order directed? nr-of-edges
          for-each-node for-each-edge
-         add-edge! delete-edge!
+         add-edge! delete-edge! graph-edge-to
          adjacent?
          label label! edge-label)
  (import (rnrs base)

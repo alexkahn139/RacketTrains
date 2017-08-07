@@ -43,6 +43,16 @@
      (hash-set! node-dict id i)
      (set! i (+ 1 i)))))
 
+(define (real-node graph-n)
+  (define res #f)
+  (hash-for-each
+   node-dict
+   (lambda (n g)
+     (when (eq? g graph-n)
+       (set! res n))))
+  res)
+
+
 (define (load-rwm filename)
   (let ([lines (map string-split (file->lines filename))]
         [ls (make-hash)] ; Hash set is nessecary for the locomotives
@@ -154,5 +164,90 @@
             (eq? (dt 'get-id) id))
           (all-dt))
   )
+
+(define (calculate-path block-1 block-2) ; block-1 and block-2 are the ID's
+  (define (list-from-mcons mlist) ; Changes the mcons list to a normal list
+    (define (iterloop m-l l)
+      (if (null? m-l)
+          (reverse l)
+          (iterloop (mcdr m-l) (cons (mcar m-l) l))))
+    (iterloop mlist '()))
+  (define start-block (car (find-dt block-1))) ; lookup the block object
+  (define start-node (start-block 'get-node1))
+  (define stop-block (car (find-dt block-2))) ; lookup the block object
+  (define stop-node (stop-block 'get-node1))
+  (define start-vertex (hash-ref node-dict start-node)) ; Gets the notation in the graph
+  (define stop-vertex (hash-ref node-dict stop-node))
+  (define schedule (reverse (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
+  (set! schedule (map real-node schedule)) ; hash-ref is fast if we need to retranslate
+  (displayln schedule)
+  (set! schedule (fix-switches schedule block-1 block-2))
+  (displayln schedule)
+  (set! schedule (make-usable-path schedule start-block stop-block))
+  (flatten schedule))
+
+(define (make-usable-path path begin end)
+  (define node-B   (begin 'get-node2))
+  (define node-D   (end 'get-node2))
+  (when (or (and (not (= (length path) 1)) (not (eq? (cadr path) node-B)))
+            (eq? (car path) node-B))
+    (set! path (cons node-B path)))
+  (set! path (reverse path))
+  (when (not (eq? (cadr path) node-D))
+    (set! path (cons node-D path)))
+  (reverse path))
+
+;; Fixen van switchen,
+;;; Kijken of 2 deel uitmaken van dezelfde switche
+;;; Zo nee ID ertussen proppen en dan verder zien
+
+(define (fix-switches schedule block-1 block-2)
+  ; Different options can cause problems
+  ;;; - The path uses the same switch in a row (nB->nA->nC). The solution is to make the train drive another path until a DT
+  ;;; - The other problem is when to switches follow each other and the second switch is not detected correctly
+  (define (make-detour rest-of-path result-path)
+    (displayln "Make detour")
+    (define (neighbours rest-of-path result-path)
+      (define (dt-loop node1 prev result)
+        (display prev)
+        (define node2 (car (remove prev (find-neighbours node1))))
+        (displayln node2)
+        (define track (find-railwaypiece node1 node2))
+      
+        (set! result (cons node2 result))
+
+        (if (eq? 'detection-track (track 'get-type))
+            (begin (displayln (list? result)) result)
+            (dt-loop node2 node1 result)))
+      (define node1 (cadr rest-of-path))
+      (define prev (car rest-of-path))
+      (set! result-path (cons (dt-loop node1 prev '())
+                              node1))
+      result-path)
+
+    (set! result-path (cons (car rest-of-path) result-path)) ; Add nB to the result
+    (set! result-path (cons (cadr rest-of-path) result-path)) ; Add nA to the result
+    ;; Now the detour should be calculated and added
+    (set! result-path (cons (neighbours rest-of-path result-path) result-path))
+    (check-loop (cddr rest-of-path) result-path)
+    )
+  (define path '())
+  (define (check-loop rest-of-path result-path) ; Only if the track could be a switch a test is needed
+    (cond
+      ((<= 3 (length rest-of-path))
+       (if (eq? (find-railwaypiece (car rest-of-path) (cadr rest-of-path))    ; The first option, in this
+                (find-railwaypiece (cadr rest-of-path) (caddr rest-of-path))) ; case we have to make a detour
+           (make-detour rest-of-path result-path)
+           (check-loop (cdr rest-of-path) (cons (car rest-of-path) result-path))))
+      ((null? rest-of-path) (reverse result-path))
+      (else (check-loop (cdr rest-of-path) (cons (car rest-of-path) result-path)))))
+  (check-loop schedule '()))
+
+(define (find-neighbours node)
+  (set! node (hash-ref node-dict node))
+  (define neighbours '())
+  (for-each-edge node-graph node (lambda (edge-to label)
+                                   (set! neighbours (cons (real-node edge-to) neighbours))))
+  neighbours)
 
 (define railwaymodel (load-rwm "be_simple.txt"))
