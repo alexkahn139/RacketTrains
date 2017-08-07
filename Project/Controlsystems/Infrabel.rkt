@@ -30,6 +30,11 @@
   (define (clear-schedule train)
     ((train 'set-schedule!) '()))
 
+	(define (set-new-destination train-id path)
+		(define train (find-train train-id))
+		((train 'set-schedule!) path)
+		((train 'set-next-dt!) (car path) (cadr path)))
+
   (define (update) ; Update function. Moves the train if needed, and sets the switches correctly
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
                                            ;(prepare-tracks train)
@@ -85,8 +90,7 @@
     (define (find-loop rst-sched)
       (when (not (null? rst-sched))
       (define node1 (car rst-sched))
-      (define node2 '())
-        (set! node2 (cadr rst-sched))
+      (define node2 (cadr rst-sched))
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         ;(newline)
         ;(display (track 'get-node1)) (displayln node1)
