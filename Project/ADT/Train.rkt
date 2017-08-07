@@ -22,12 +22,15 @@
     ;    (set-next-detection-track! (car schedule-list) (cadr schedule-list))
     ;    (set! next-detection-track '()))
     (set! schedule schedule-list)
-    (displayln schedule))
+    ;(displayln schedule)
+    )
 
 	(define (set-next-detection-track! node1 node2)
 
 		(set! next-detection-track (cons node1 node2))
-    (display "set-next-detection-track to: ") (displayln next-detection-track))
+    ;(display "set-next-detection-track to: ") (displayln next-detection-track)
+    ;(display "Remaining path") (displayln schedule)
+    )
 
   (define (set-direction! dir)
     (set! direction dir))

@@ -39,7 +39,7 @@
                                              (when (get-locomotive-location (train 'get-id))
                                                (define schedule (train 'get-schedule))
                                                (fix-schedule train next-dt schedule)
-                                               (fix-switches schedule)
+                                               (fix-switches train schedule)
                                                ;(find-next-dt train schedule)
                                                )
                                                )
@@ -98,9 +98,12 @@
     (find-loop schedule))
 
 
-  (define (fix-switches schedule) ; Set's the switches correctly
+  (define (fix-switches train schedule) ; Set's the switches correctly
     (define (set-loop rst-sched)
-      (when (> (length rst-sched) 2)
+      (when (and (> (length rst-sched) 2)
+                  (not (and (eq? (car(train 'get-next-dt)) (car rst-sched))
+                            (eq? (cdr (train 'get-next-dt)) (cadr rst-sched)))))
+        ;(display (train 'get-next-dt)) (displayln (cons (car rst-sched) (cadr rst-sched)))
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         (define pos-track (find-railwaypiece (cadr rst-sched) (caddr rst-sched)))
         (when (and track (eq? 'switch (track 'get-type)))
@@ -114,6 +117,7 @@
     (set-loop schedule))
 
   (define (calculate-switch switch nA nB)
+    ;(display (switch 'get-id)) (display " Setting switches ")
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
     (define n2 (switch 'get-node2))
@@ -125,7 +129,9 @@
           ((and (eqv? n1 nB) (eqv? n2 nA))
            (set-switch-state! id 1))
           ((and (eqv? n1 nB) (eqv? n3 nA))
-           (set-switch-state! id 2))))
+           (set-switch-state! id 2)))
+    ;(displayln (get-switch-state id))
+    )
 
   (define (calculate-direction train nodeA nodeB)
     (define track (find-railwaypiece (car (train 'get-next-dt)) (cdr (train 'get-next-dt))))
