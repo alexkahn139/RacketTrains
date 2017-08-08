@@ -227,7 +227,7 @@
   (set! loco-list (map (lambda (number)
                          (number->string (+ number 1)))
                        loco-list))
-  (set! train-choice (car loco-list))
+  (set! train-choice (string->number (car loco-list)))
   loco-list)
 (define train-choice-list (train-field-list))
 
@@ -265,7 +265,7 @@
      [label "Drive"]
      ; Callback procedure for a button click:
      (callback (lambda (button event)
-                 ((nmbs 'schedule-destination!) (string->number train-choice) dt-choice)))) ; Hier de geselecteerde trein laten rijden
+                 ((nmbs 'schedule-destination!) train-choice dt-choice)))) ; Hier de geselecteerde trein laten rijden
 
 
 ; Derive a new canvas (a drawing window) class to handle events
