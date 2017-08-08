@@ -55,5 +55,6 @@
   (client output))
 
 
-(define (set-up-client port)
+(define (set-up-client port host)
+  (set! SERVER-HOST host)
   (set! SERVICE-PORT port))

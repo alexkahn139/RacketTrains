@@ -16,10 +16,10 @@
 (define loop #t)
 ;(define port (random 2000 65535)) (display port)
 (define port 29486)
+;(define host "192.168.0.160")
+(define host "localhost")
 
-
-(set-up-client port)
-
+(set-up-client port host)
 
 (define (nmbs-loop)
   (sleep 0.02)

@@ -21,4 +21,4 @@
   (infra-loop))
 
 (when loop
-  (thread infra-loop))
+  (infra-loop))
