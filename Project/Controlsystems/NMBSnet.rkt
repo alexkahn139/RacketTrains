@@ -9,7 +9,7 @@
 
 
 (provide get-all
-         set-up-listener
+         set-up-client
          send-path)
 
 ; http://www.cs.utah.edu/plt/mailarch/plt-scheme-2002/msg00955.html, helped me out a lot to start up the server side of things
@@ -55,5 +55,5 @@
   (client output))
 
 
-(define (set-up-listener port)
+(define (set-up-client port)
   (set! SERVICE-PORT port))

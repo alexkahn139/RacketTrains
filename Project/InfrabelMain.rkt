@@ -1,38 +1,24 @@
 #lang racket
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                Main                  ;;
+;;            Infrabel-main             ;;
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require "../Project/Controlsystems/Infrabel.rkt")
-(require "../Project/Controlsystems/NMBS.rkt")
-(require "../Project/GUI/GUI.rkt")
 (require "../Project/Controlsystems/Infranet.rkt")
-(require "../Project/Controlsystems/NMBSnet.rkt")
-
 
 (define infrabel (make-infrabel))
-(define NMBS (make-nmbs))
 (define loop #t)
 ;(define port (random 2000 65535)) (display port)
 (define port 29486)
 
 (set-up-server infrabel port)
-(set-up-listener port)
 
 (define (infra-loop)
   (sleep 0.02)
   ((infrabel 'update))
   (infra-loop))
 
-(define (nmbs-loop)
-  (sleep 0.02)
-  (draw-all NMBS)
-  (when loop
-    (nmbs-loop)))
-
 (when loop
-  (thread nmbs-loop)
-  (thread infra-loop)
-  )
+  (thread infra-loop))

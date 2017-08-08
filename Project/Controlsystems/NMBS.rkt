@@ -53,4 +53,5 @@
       ;((eq? msg 'print-status) print-status)
       ((eq? msg 'schedule-destination!) schedule-destination!)
       (else (error "Unkown Message"))))
+	(start-simulator)
   dispatch)
