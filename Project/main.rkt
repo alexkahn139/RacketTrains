@@ -8,7 +8,6 @@
 (require "../Project/Controlsystems/Infrabel.rkt")
 (require "../Project/Controlsystems/NMBS.rkt")
 (require "../Project/GUI/GUI.rkt")
-(require "../Project/ADT/RailwayModel.rkt")
 (require "../Project/Controlsystems/Infranet.rkt")
 (require "../Project/Controlsystems/NMBSnet.rkt")
 
