@@ -181,7 +181,6 @@
   (define stop-vertex (hash-ref node-dict stop-node))
   (define schedule (reverse (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
   (set! schedule (map real-node schedule)) ; hash-ref is fast if we need to retranslate
-  (displayln schedule)
   (set! schedule (fix-double-switches schedule))
   (set! schedule (make-usable-path schedule start-block stop-block))
   (flatten schedule))
@@ -210,9 +209,7 @@
       (define (dt-loop node1 prev result)
         (define node2 (car (remove prev (find-neighbours node1))))
         (define track (find-railwaypiece node1 node2))
-
         (set! result (cons node2 result))
-
         (if (eq? 'detection-track (track 'get-type))
             result
             (dt-loop node2 node1 result)))
@@ -241,29 +238,46 @@
   (check-loop schedule '()))
 
 (define (fix-double-switches schedule)
+  (define doubles #f)
   (define (check-loop current-path rest-of-path)
     (if (> 2 (length rest-of-path))
-        (fix-switches (reverse (cons (car rest-of-path) current-path)))
+        (if doubles
+            (reverse (cons (car rest-of-path) current-path))
+            (fix-switches (reverse (cons (car rest-of-path) current-path))))
         (let* ((label (label node-graph (hash-ref node-dict (cadr rest-of-path)))))
           (if (eq? 'no-label label)
               (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))
               (let* ((switch label)
                      (id1 ((find-railwaypiece (car rest-of-path) (cadr rest-of-path)) 'get-id))
                      (id2 ((find-railwaypiece (cadr rest-of-path) (caddr rest-of-path)) 'get-id))
-                     (n1 (switch 'get-node1)))
+                     (n1 (switch 'get-node1))
+                     )
                 (if (and (not (eq? id1 n1))
                          (not (eq? id2 n1)))
                     (fix-the-path id1 id2 n1 current-path rest-of-path)
                     (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))))))))
   (define (fix-the-path id1 id2 n1 current-path rest-of-path)
     (displayln "FIXIN")
-    (set! current-path (cons (car rest-of-path) current-path))
-    (set! current-path (cons (cadr rest-of-path) current-path))
-    (set! current-path (cons id1 current-path))
-    (set! current-path (cons n1 current-path))
-    (set! current-path (cons id2 current-path))
-    (set! current-path (cons (cadr rest-of-path) current-path))
-    (set! current-path (cons (caddr rest-of-path) current-path))
+    (set! doubles #t)
+    (set! current-path (cons (car rest-of-path) current-path)) ;A2
+    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx ; Has to stay for setting tth switch
+    (set! current-path (cons id1 current-path)) ;A1
+    (set! current-path (cons n1 current-path)) ;Bx
+    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
+    (define neighbours (find-neighbours (cadr rest-of-path)))
+    (display "Neigbours ")(displayln neighbours)
+    (define neighbour (correct-neigbour (cadr rest-of-path) n1 neighbours))
+    (set! current-path (cons neighbour current-path)) ;Nm
+    (set! neighbours (find-neighbours neighbour))
+    (set! neighbours (remove neighbour neighbours))
+    (set! current-path (cons (car neighbours) current-path)) ;Lg
+    (display "neighbour ")(displayln neighbour)
+    (set current-path (cons neighbour current-path)) ;Nm
+    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
+    (set! current-path (cons n1 current-path)) ;Bx
+    (set! current-path (cons id2 current-path)) ;Gt
+    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
+    (set! current-path (cons (caddr rest-of-path) current-path)) ;Bg
     (displayln current-path)
     (check-loop current-path (cddr rest-of-path)))
   (check-loop '() schedule))
@@ -276,5 +290,12 @@
   (for-each-edge node-graph node (lambda (edge-to label)
                                    (set! neighbours (cons (real-node edge-to) neighbours))))
   neighbours)
+
+(define (correct-neigbour node id neighbours)
+  (define (loop rem-neighbours)
+    (if (eq? ((find-railwaypiece node (car rem-neighbours)) 'get-id) id)
+        (car rem-neighbours)
+        (loop (cdr rem-neighbours))))
+  (loop neighbours))
 
 (define railwaymodel (load-rwm "be_simple.txt"))

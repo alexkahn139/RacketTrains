@@ -23,8 +23,8 @@
     ;    (set-next-detection-track! (car schedule-list) (cadr schedule-list))
     ;    (set! next-detection-track '()))
     (set! schedule schedule-list)
+    (displayln "schedule")
     (displayln schedule)
-    ;(displayln schedule)
     )
 
 	(define (set-next-detection-track! node1 node2)

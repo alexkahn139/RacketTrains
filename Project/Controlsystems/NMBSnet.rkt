@@ -45,6 +45,7 @@
   (client msg))
 
 (define (send-path train-id path)
+  (displayln path)
   (define output (number->string train-id))
   (define (list-to-string list)
     (when (not (null? list))
