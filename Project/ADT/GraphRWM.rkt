@@ -83,7 +83,7 @@
                      [graph-n0 (hash-ref node-dict n0)]
                      [graph-n1 (hash-ref node-dict n1)]
                      [graph-n2 (hash-ref node-dict n2)])
-                (label! node-graph graph-id 'id)
+                (label! node-graph graph-id res)
                 (add-edge! node-graph graph-n0 graph-n1 res)    ; The nodes should be put in the correct form
                 (add-edge! node-graph graph-n0 graph-n2 res))]  ; Add the ADT as data structure
          [(T) (let* ([n1 (string->symbol (list-ref l 1))]
@@ -181,7 +181,8 @@
   (define stop-vertex (hash-ref node-dict stop-node))
   (define schedule (reverse (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
   (set! schedule (map real-node schedule)) ; hash-ref is fast if we need to retranslate
-  (set! schedule (fix-switches schedule block-1 block-2))
+  (displayln schedule)
+  (set! schedule (fix-double-switches schedule))
   (set! schedule (make-usable-path schedule start-block stop-block))
   (flatten schedule))
 
@@ -200,7 +201,7 @@
 ;;; Kijken of 2 deel uitmaken van dezelfde switche
 ;;; Zo nee ID ertussen proppen en dan verder zien
 
-(define (fix-switches schedule block-1 block-2)
+(define (fix-switches schedule)
   ; Different options can cause problems
   ;;; - The path uses the same switch in a row (nB->nA->nC). The solution is to make the train drive another path until a DT
   ;;; - The other problem is when to switches follow each other and the second switch is not detected correctly
@@ -238,6 +239,36 @@
       ((null? rest-of-path) (reverse result-path))
       (else (check-loop (cdr rest-of-path) (cons (car rest-of-path) result-path)))))
   (check-loop schedule '()))
+
+(define (fix-double-switches schedule)
+  (define (check-loop current-path rest-of-path)
+    (if (> 2 (length rest-of-path))
+        (fix-switches (reverse (cons (car rest-of-path) current-path)))
+        (let* ((label (label node-graph (hash-ref node-dict (cadr rest-of-path)))))
+          (if (eq? 'no-label label)
+              (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))
+              (let* ((switch label)
+                     (id1 ((find-railwaypiece (car rest-of-path) (cadr rest-of-path)) 'get-id))
+                     (id2 ((find-railwaypiece (cadr rest-of-path) (caddr rest-of-path)) 'get-id))
+                     (n1 (switch 'get-node1)))
+                (if (and (not (eq? id1 n1))
+                         (not (eq? id2 n1)))
+                    (fix-the-path id1 id2 n1 current-path rest-of-path)
+                    (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))))))))
+  (define (fix-the-path id1 id2 n1 current-path rest-of-path)
+    (displayln "FIXIN")
+    (set! current-path (cons (car rest-of-path) current-path))
+    (set! current-path (cons (cadr rest-of-path) current-path))
+    (set! current-path (cons id1 current-path))
+    (set! current-path (cons n1 current-path))
+    (set! current-path (cons id2 current-path))
+    (set! current-path (cons (cadr rest-of-path) current-path))
+    (set! current-path (cons (caddr rest-of-path) current-path))
+    (displayln current-path)
+    (check-loop current-path (cddr rest-of-path)))
+  (check-loop '() schedule))
+
+
 
 (define (find-neighbours node)
   (set! node (hash-ref node-dict node))
