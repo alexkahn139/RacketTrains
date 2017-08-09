@@ -10,7 +10,6 @@
 
 (define infrabel (make-infrabel))
 (define loop #t)
-;(define port (random 2000 65535)) (display port)
 (define port 29486)
 
 (set-up-server infrabel port)

@@ -59,8 +59,7 @@
        (define id (loco 'get-id))
        (if (eq? (get-locomotive-location id) track-id)
            (set! light #t)
-           'ok))
-     )
+           'ok)))
     light)
 
   (define (drive-train train) ; Makes the train move if needed, by calculating the max allowed speed
@@ -74,7 +73,6 @@
             ((next-dt (train 'get-next-dt)) ; next-dt should be a list with the two nodes
              (det (find-railwaypiece (car next-dt) (cdr next-dt)))
              (last-dt (find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule)))))
-        ;(display (det 'get-id))(displayln (get-locomotive-location (train 'get-id)))
           (cond ((eq? (last-dt 'get-id) (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
                 ((eq? (get-locomotive-location (train 'get-id)) (det 'get-id)) (find-next-dt train (cdr schedule)))
                 ((get-light det) (set-loco-speed! (train 'get-id) 0)); If there is another train, the train stops
@@ -89,14 +87,13 @@
           (fix-schedule train next-dt (cdr rest-schedule)))))
 
   (define (find-next-dt train schedule)
-    (displayln "finding")
     (define (find-loop rst-sched)
       (when (>= (length rst-sched) 2)
       (define node1 (car rst-sched))
       (define node2 (cadr rst-sched))
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         (if (and track (eq? 'detection-track (track 'get-type)))
-            (begin (displayln (cons node1 node2)) ((train 'set-next-dt!) node1 node2))
+            ((train 'set-next-dt!) node1 node2)
             (find-loop (cdr rst-sched)))))
     (find-loop schedule))
 
@@ -106,7 +103,6 @@
       (when (and (> (length rst-sched) 2)
                   (not (and (eq? (car(train 'get-next-dt)) (car rst-sched))
                             (eq? (cdr (train 'get-next-dt)) (cadr rst-sched)))))
-        ;(display (train 'get-next-dt)) (displayln (cons (car rst-sched) (cadr rst-sched)))
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         (define pos-track (find-railwaypiece (cadr rst-sched) (caddr rst-sched)))
         (when (and track (eq? 'switch (track 'get-type)))
@@ -120,7 +116,6 @@
     (set-loop schedule))
 
   (define (calculate-switch switch nA nB)
-    ;(display (switch 'get-id)) (display " Setting switches ")
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
     (define n2 (switch 'get-node2))
@@ -132,9 +127,7 @@
           ((and (eqv? n1 nB) (eqv? n2 nA))
            (set-switch-state! id 1))
           ((and (eqv? n1 nB) (eqv? n3 nA))
-           (set-switch-state! id 2)))
-    ;(displayln (get-switch-state id))
-    )
+           (set-switch-state! id 2))))
 
   (define (calculate-direction train nodeA nodeB)
     (define track (find-railwaypiece (car (train 'get-next-dt)) (cdr (train 'get-next-dt))))
