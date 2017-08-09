@@ -6,23 +6,27 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require "../ADT/GraphRWM.rkt")
-(require "../Simulator/interface.rkt")
+(require "../Railways/Railway.rkt")
 (require "../Abstractions.rkt")
 
 (provide make-infrabel)
 
-(define (make-infrabel)
+(define (make-infrabel sim)
 
+	(define railway (make-railway sim))
 
   ;; Location of the train, if it is on a detection-block
   (define (get-locomotive-location id)
-    (get-loco-detection-block id))
+    ((railway 'get-loco-detection-block) id))
+
+	(define (set-locomotive-speed id speed)
+		((railway 'set-loco-speed!) id speed))
 
   (define (get-switch-state id)
-    (get-switch-position id))
+    ((railway 'get-switch-position) id))
 
   (define (set-switch-state! id new-pos)
-    (set-switch-position! id new-pos))
+    ((railway 'set-switch-position!) id new-pos))
 
   (define (clear-schedule train)
     ((train 'set-schedule!) '()))
@@ -62,7 +66,7 @@
   (define (drive-train train) ; Makes the train move if needed, by calculating the max allowed speed
     (define schedule (train 'get-schedule))
     (define (arrived)
-      (set-loco-speed! (train 'get-id) 0)
+      (set-locomotive-speed! (train 'get-id) 0)
       (clear-schedule train))
     (when (not (null? schedule))
       (begin
@@ -72,8 +76,8 @@
              (last-dt (find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule)))))
           (cond ((eq? (last-dt 'get-id) (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
                 ((eq? (get-locomotive-location (train 'get-id)) (det 'get-id)) (find-next-dt train (cdr schedule)))
-                ((get-light det) (set-loco-speed! (train 'get-id) 0)); If there is another train, the train stops
-                (else (set-loco-speed! (train 'get-id) (calculate-train-movement train))))))))
+                ((get-light det) (set-locomotive-speed! (train 'get-id) 0)); If there is another train, the train stops
+                (else (set-locomotive-speed! (train 'get-id) (calculate-train-movement train))))))))
 
   (define (fix-schedule train next-dt rest-schedule) ; Function to delete te part of the schedule that's already driven
     (when (> (length rest-schedule) 2)
@@ -177,6 +181,5 @@
       ((eq? msg 'set-new-destination!) set-new-destination!)
       (else (error "Unknown message"))
       ))
-  (start-simulator)
 
   dispatch)
