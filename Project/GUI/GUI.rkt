@@ -30,7 +30,7 @@
 (define dt-choice 1)
 
 (define (search-in-list id list)
-  (cond ((null? list) (error "Not in list"))
+  (cond ((null? list) (error "Not in list" id))
         ((eq? id (caar list)) (cdar list))
         (else (search-in-list id (cdr list)))))
 
@@ -44,7 +44,7 @@
                          [width size]
                          [height size]))
 (define (scale coordinate)
-  (/ (* coordinate size) 1000))
+  (/ (* coordinate size) 680))
 
 ; Get all the things that should be drawn (Locomotives, nodes, tracks switches) and put them in a list
 (define (get-nodes)

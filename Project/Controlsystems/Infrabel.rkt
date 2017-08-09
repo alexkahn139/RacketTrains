@@ -13,14 +13,14 @@
 
 (define (make-infrabel sim)
 
-	(define railway (make-railway sim))
+  (define railway (make-railway sim))
 
   ;; Location of the train, if it is on a detection-block
   (define (get-locomotive-location id)
     ((railway 'get-loco-detection-block) id))
 
-	(define (set-locomotive-speed! id speed)
-		((railway 'set-loco-speed!) id speed))
+  (define (set-locomotive-speed! id speed)
+    ((railway 'set-loco-speed!) id speed))
 
   (define (get-switch-state id)
     ((railway 'get-switch-position) id))
@@ -31,10 +31,10 @@
   (define (clear-schedule train)
     ((train 'set-schedule!) '()))
 
-	(define (set-new-destination! train-id path)
-		(define train (find-train train-id))
-		((train 'set-schedule!) path)
-		((train 'set-next-dt!) (car path) (cadr path)))
+  (define (set-new-destination! train-id path)
+    (define train (find-train train-id))
+    ((train 'set-schedule!) path)
+    ((train 'set-next-dt!) (car path) (cadr path)))
 
   (define (update) ; Update function. Moves the train if needed, and sets the switches correctly
     (hash-for-each (rwm-ls railwaymodel) (lambda (id train)
@@ -48,7 +48,7 @@
                                                (fix-switches train schedule)
                                                ;(find-next-dt train schedule)
                                                )
-                                               )
+                                             )
                                            (drive-train train))))
 
   (define (get-light track) ; Returns true, when the light is red
@@ -68,16 +68,17 @@
     (define (arrived)
       (set-locomotive-speed! (train 'get-id) 0)
       (clear-schedule train))
-    (when (not (null? schedule))
-      (begin
-        (let*
-            ((next-dt (train 'get-next-dt)) ; next-dt should be a list with the two nodes
-             (det (find-railwaypiece (car next-dt) (cdr next-dt)))
-             (last-dt (find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule)))))
-          (cond ((eq? (last-dt 'get-id) (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
-                ((eq? (get-locomotive-location (train 'get-id)) (det 'get-id)) (find-next-dt train (cdr schedule)))
-                ((get-light det) (set-locomotive-speed! (train 'get-id) 0)); If there is another train, the train stops
-                (else (set-locomotive-speed! (train 'get-id) (calculate-train-movement train))))))))
+    (if (> 2 (length schedule))
+        (set-locomotive-speed! (train 'get-id) 0)
+        (begin
+          (let*
+              ((next-dt (train 'get-next-dt)) ; next-dt should be a list with the two nodes
+               (det (find-railwaypiece (car next-dt) (cdr next-dt)))
+               (last-dt (find-railwaypiece (car (reverse schedule)) (cadr (reverse schedule)))))
+            (cond ((eq? (last-dt 'get-id) (get-locomotive-location (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
+                  ((eq? (get-locomotive-location (train 'get-id)) (det 'get-id)) (find-next-dt train (cdr schedule)))
+                  ((get-light det) (set-locomotive-speed! (train 'get-id) 0)); If there is another train, the train stops
+                  (else (set-locomotive-speed! (train 'get-id) (calculate-train-movement train))))))))
 
   (define (fix-schedule train next-dt rest-schedule) ; Function to delete te part of the schedule that's already driven
     (when (> (length rest-schedule) 2)
@@ -90,8 +91,8 @@
   (define (find-next-dt train schedule)
     (define (find-loop rst-sched)
       (when (>= (length rst-sched) 2)
-      (define node1 (car rst-sched))
-      (define node2 (cadr rst-sched))
+        (define node1 (car rst-sched))
+        (define node2 (cadr rst-sched))
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         (if (and track (eq? 'detection-track (track 'get-type)))
             ((train 'set-next-dt!) node1 node2)
@@ -102,21 +103,25 @@
   (define (fix-switches train schedule) ; Set's the switches correctly
     (define (set-loop rst-sched)
       (when (and (> (length rst-sched) 2)
-                  (not (and (eq? (car(train 'get-next-dt)) (car rst-sched))
-                            (eq? (cdr (train 'get-next-dt)) (cadr rst-sched)))))
+                 (not (and (eq? (car(train 'get-next-dt)) (car rst-sched))
+                           (eq? (cdr (train 'get-next-dt)) (cadr rst-sched)))))
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         (define pos-track (find-railwaypiece (cadr rst-sched) (caddr rst-sched)))
         (when (and track (eq? 'switch (track 'get-type)))
+          (display (displayln track))
           (calculate-switch track (car rst-sched) (cadr rst-sched)))
-        (when (and track pos-track (eq? 'switch (track 'get-type)) (eq? 'switch (pos-track 'get-type))) ; Needed for when there is a double switch, otherwise the ID never gets found
-          (let* ((nodeA (track 'get-id))
-                 (nodeB (pos-track 'get-id))
-                 (new-track (find-railwaypiece nodeA nodeB)))
-            (calculate-switch new-track nodeA nodeB)))
+        ;(when (and track pos-track (eq? 'switch (track 'get-type)) (eq? 'switch (pos-track 'get-type))) ; Needed for when there is a double switch, otherwise the ID never gets found
+        ;  (let* ((nodeA (track 'get-id))
+        ;         (nodeB (pos-track 'get-id))
+        ;         (new-track (find-railwaypiece nodeA nodeB)))
+        ;    ;(when new-track
+        ;    (calculate-switch new-track nodeA nodeB)))
+        ;;)
         (set-loop (cdr rst-sched))))
     (set-loop schedule))
 
   (define (calculate-switch switch nA nB)
+    (displayln switch)
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
     (define n2 (switch 'get-node2))
@@ -147,7 +152,7 @@
            (track (find-railwaypiece current next)))
         (set! max-speed (min max-speed loco-speed))
         (when track
-           (track 'get-max-speed))
+          (track 'get-max-speed))
         (if (< (length (cdr schedule)) 2)
             (* (train 'get-direction) max-speed)
             (loop max-speed (cdr schedule)))))

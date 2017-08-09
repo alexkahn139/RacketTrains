@@ -63,13 +63,17 @@
 		(cadddr (cddddr (cdr switch))))
 
 (define (string-to-id str)
-	(string->number (substring str 0 1)))
+	(if (string->number (substring str 0 2))
+	 		(string->number (substring str 0 2))
+			(string->number (substring str 0 1))))
 
 (define (string-to-number str)
 	(cond
 		((string=? "f" (substring str 2 3)) #f)
 		((string=? "t" (substring str 2 3)) #t)
-		(else (string->number (substring str 2 3)))))
+		(else (if (= (string-length str) 4)
+							(string->number (substring str 2 4))
+							(string->number (substring str 2 3))))))
 
 (define (location-in-list id list)
 	(cdar (filter (lambda (cc) (eq? (car cc) id)) list)))

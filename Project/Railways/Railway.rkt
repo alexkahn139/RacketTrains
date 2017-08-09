@@ -63,10 +63,11 @@
 		(cond
 			((eq? msg 'get-locomotive-location) get-locomotive-location)
 			((eq? msg 'get-switch-position) get-switch-position)
+			((eq? msg 'get-loco-detection-block) get-locomotive-location)
 
 			((eq? msg 'set-switch-position!) set-switch-position!)
 			((eq? msg 'set-loco-speed!) set-loco-speed!)
-			(else (error "Unknown message"))
+			(else (error "Unknown message" msg))
 		))
 	(if sim
 		(sim:start-simulator)
