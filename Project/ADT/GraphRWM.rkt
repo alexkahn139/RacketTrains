@@ -272,7 +272,7 @@
     (set! neighbours (remove neighbour neighbours))
     (set! current-path (cons (car neighbours) current-path)) ;Lg
     (display "neighbour ")(displayln neighbour)
-    (set current-path (cons neighbour current-path)) ;Nm
+    (set! current-path (cons neighbour current-path)) ;Nm
     (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
     (set! current-path (cons n1 current-path)) ;Bx
     (set! current-path (cons id2 current-path)) ;Gt

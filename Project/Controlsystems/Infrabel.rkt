@@ -13,9 +13,6 @@
 
 (define (make-infrabel)
 
-  ;; Speed of the train
-  (define (get-locomotive-speed id)
-    (get-loco-speed id))
 
   ;; Location of the train, if it is on a detection-block
   (define (get-locomotive-location id)
@@ -170,7 +167,6 @@
     (cond
       ((eq? msg 'update) update)
       ; Getters
-      ((eq? msg 'get-locomotive-speed) get-locomotive-speed)
       ((eq? msg 'get-locomotive-location) get-locomotive-location)
       ((eq? msg 'get-switch-state) get-switch-state)
       ((eq? msg 'get-light) get-light)
