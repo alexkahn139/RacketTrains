@@ -7,7 +7,7 @@
 
 (require "../ADT/GraphRWM.rkt")
 ;(require "../ADT/RwmToGraph.rkt")
-(require "../Simulator/interface.rkt")
+;(require "../Simulator/interface.rkt")
 (require "../Abstractions.rkt")
 (require "../Controlsystems/NMBSnet.rkt")
 
@@ -53,5 +53,5 @@
       ;((eq? msg 'print-status) print-status)
       ((eq? msg 'schedule-destination!) schedule-destination!)
       (else (error "Unkown Message"))))
-	(start-simulator)
+;	(start-simulator)
   dispatch)

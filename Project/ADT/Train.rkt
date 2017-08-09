@@ -5,9 +5,6 @@
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require "../Simulator/interface.rkt")
-
-
 (provide make-train)
 
 (define (make-train id)

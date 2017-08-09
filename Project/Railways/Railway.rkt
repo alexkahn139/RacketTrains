@@ -6,11 +6,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require (prefix-in sim: "simulator/interface.rkt"))
-(require (prefix-in real: "z21/FullAPI/Z21Socket.rkt"))
-(require (prefix-in real: "z21/FullAPI/Z21MessageDriving.rkt"))
-(require (prefix-in real: "z21/FullAPI/Z21MessageSwitches.rkt"))
-(require (prefix-in real: "z21/FullAPI/Z21MessageLocation.rkt"))
-(require "z21/FullAPI/racket-bits-utils-master/bits.rkt")
+(require (prefix-in real: "z21-scheme/FullAPI/Z21Socket.rkt"))
+(require (prefix-in real: "z21-scheme/FullAPI/Z21MessageDriving.rkt"))
+(require (prefix-in real: "z21-scheme/FullAPI/Z21MessageSwitches.rkt"))
+(require (prefix-in real: "z21-scheme/FullAPI/Z21MessageLocation.rkt"))
+(require (prefix-in real: "z21-scheme/APITesting/MessageHandler.rkt"))
+(require "z21-scheme/FullAPI/racket-bits-utils-master/bits.rkt")
 
 (provide make-railway)
 
@@ -20,8 +21,8 @@
 	(define socket #f)
 
 	(define (startZ21)
-		(set! socket (Z21:setup))
-		(Z21:listen socket Z21:handle-msg))
+		(set! socket (real:setup))
+		(real:listen socket real:handle-msg))
 
 	(define (find-correct-id id msg)
 		(display msg))
@@ -34,13 +35,13 @@
 					((lsb (byte->hex-string id))
 					 (msb "OO")
 					 (dir (> speed 0))
-					 (speed (abs (* scale speed)))
-				 (Z21:send socket (Z21:make-set-loco-drive-msg lsb msb Z21:high-speed dir speed))))))
+					 (speed (abs (* scale speed))))
+				 (real:send socket (real:make-set-loco-drive-msg lsb msb 128 dir speed)))))
 
 	(define (get-locomotive-location id)
 		(if sim
 				(sim:get-loco-detection-block id)
-				(find-correct-id id (Z21:send socket (Z21:make-rmbus-get-data-msg "00")))))
+				(find-correct-id id (real:send socket (real:make-rmbus-get-data-msg "00")))))
 
 	(define (get-switch-position id)
 		(if sim
@@ -48,15 +49,15 @@
 				(let*
 					((lsb (byte->hex-string id))
 					 (msb "OO"))
-				 (Z21:make-get-switch-info-msg lsb msb))))
+				 (real:make-get-switch-info-msg lsb msb))))
 
-	(define (set-switch-position! id)
+	(define (set-switch-position! id pos)
 		(if sim
-				(sim:set-switch-position! id new-pos)
+				(sim:set-switch-position! id pos)
 				(let*
 					((lsb (byte->hex-string id))
 					 (msb "O1"))
-				  (Z21:send socket (Z21:make-set-switch-msg lsb msb #t pos)))))
+				  (real:send socket (real:make-set-switch-msg lsb msb #t pos)))))
 
 	(define (dispatch msg)
 		(cond
@@ -64,6 +65,7 @@
 			((eq? msg 'get-switch-position) get-switch-position)
 
 			((eq? msg 'set-switch-position!) set-switch-position!)
+			((eq? msg 'set-loco-speed!) set-loco-speed!)
 			(else (error "Unknown message"))
 		))
 	(if sim

@@ -19,7 +19,7 @@
   (define (get-locomotive-location id)
     ((railway 'get-loco-detection-block) id))
 
-	(define (set-locomotive-speed id speed)
+	(define (set-locomotive-speed! id speed)
 		((railway 'set-loco-speed!) id speed))
 
   (define (get-switch-state id)

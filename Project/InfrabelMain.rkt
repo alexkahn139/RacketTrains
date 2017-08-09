@@ -8,7 +8,7 @@
 (require "../Project/Controlsystems/Infrabel.rkt")
 (require "../Project/Controlsystems/Infranet.rkt")
 
-(define infrabel (make-infrabel))
+(define infrabel (make-infrabel #t))
 (define loop #t)
 (define port 29486)
 

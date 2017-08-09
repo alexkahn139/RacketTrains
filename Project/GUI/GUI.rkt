@@ -8,7 +8,7 @@
 (require "../ADT/GraphRWM.rkt")
 (require "../Abstractions.rkt")
 (require "../Controlsystems/NMBSnet.rkt")
-(require "../Simulator/interface.rkt")
+;(require "../Simulator/interface.rkt")
 
 
 (require racket/gui/base)
@@ -186,7 +186,7 @@
               (send dc draw-line x2 y2 xid yid)
               (send dc draw-line x3 y3 xid yid)
               (send dc set-text-foreground "black")
-              (send dc draw-text (number->string (get-switch-position sid)) (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
+              ;(send dc draw-text (number->string (get-switch-position sid)) (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
               )
             switches))
 
