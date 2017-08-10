@@ -19,7 +19,9 @@
     (set! schedule schedule-list))
 
 	(define (set-next-detection-track! node1 node2)
-		(set! next-detection-track (cons node1 node2)))
+		(set! next-detection-track (cons node1 node2))
+		(display "Next dt is: ") (displayln  next-detection-track))
+
 
   (define (set-direction! dir)
     (set! direction dir))
