@@ -33,7 +33,7 @@
 				(sim:set-loco-speed! id speed)
 				(let*
 					((lsb (byte->hex-string id))
-					 (msb "OO")
+					 (msb "00")
 					 (dir (> speed 0))
 					 (speed (abs (* scale speed))))
 				 (real:send socket (real:make-set-loco-drive-msg lsb msb 128 dir speed)))))
@@ -48,7 +48,7 @@
 				(get-switch-position id)
 				(let*
 					((lsb (byte->hex-string id))
-					 (msb "OO"))
+					 (msb "00"))
 				 (real:make-get-switch-info-msg lsb msb))))
 
 	(define (set-switch-position! id pos)
@@ -56,7 +56,7 @@
 				(sim:set-switch-position! id pos)
 				(let*
 					((lsb (byte->hex-string id))
-					 (msb "O1"))
+					 (msb "01"))
 				  (real:send socket (real:make-set-switch-msg lsb msb #t pos)))))
 
 	(define (dispatch msg)
