@@ -108,7 +108,6 @@
         (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
         (define pos-track (find-railwaypiece (cadr rst-sched) (caddr rst-sched)))
         (when (and track (eq? 'switch (track 'get-type)))
-          (display (displayln track))
           (calculate-switch track (car rst-sched) (cadr rst-sched)))
         ;(when (and track pos-track (eq? 'switch (track 'get-type)) (eq? 'switch (pos-track 'get-type))) ; Needed for when there is a double switch, otherwise the ID never gets found
         ;  (let* ((nodeA (track 'get-id))
@@ -121,7 +120,6 @@
     (set-loop schedule))
 
   (define (calculate-switch switch nA nB)
-    (displayln switch)
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
     (define n2 (switch 'get-node2))

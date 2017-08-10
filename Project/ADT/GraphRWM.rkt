@@ -181,7 +181,7 @@
   (define stop-vertex (hash-ref node-dict stop-node))
   (define schedule (reverse (list-from-mcons (shortest-path node-graph start-vertex stop-vertex))))
   (set! schedule (map real-node schedule)) ; hash-ref is fast if we need to retranslate
-  (set! schedule (fix-double-switches schedule))
+  (set! schedule (fix-switches schedule))
   (set! schedule (make-usable-path schedule start-block stop-block))
   (flatten schedule))
 
@@ -201,27 +201,34 @@
 ;;; Zo nee ID ertussen proppen en dan verder zien
 
 (define (fix-switches schedule)
+  (displayln "SWITCHES ARE ")
   ; Different options can cause problems
   ;;; - The path uses the same switch in a row (nB->nA->nC). The solution is to make the train drive another path until a DT
   ;;; - The other problem is when to switches follow each other and the second switch is not detected correctly
   (define (make-detour rest-of-path result-path)
     (define (neighbours rest-of-path result-path)
       (define (dt-loop node1 prev result)
-        (define node2 (car (remove prev (find-neighbours node1))))
+        ;(displayln (find-neighbours node1))
+        (define node2 (find-next-neighbour node1 prev (find-neighbours node1)))
+        (display "node2 ")(displayln node2)
         (define track (find-railwaypiece node1 node2))
-        (set! result (cons node2 result))
+        (set! result (cons node1 result))
+        (display "Result is : ")(displayln result)
         (if (eq? 'detection-track (track 'get-type))
-            result
+            (flatten (list (reverse result) node2 result))
             (dt-loop node2 node1 result)))
       (define node1 (cadr rest-of-path))
       (define prev (car rest-of-path))
       (set! result-path (cons (dt-loop node1 prev '())
                               node1))
+      (displayln result-path)
       result-path)
 
     (set! result-path (cons (car rest-of-path) result-path)) ; Add nB to the result
-    (set! result-path (cons (cadr rest-of-path) result-path)) ; Add nA to the result
+    ;(set! result-path (cons (cadr rest-of-path) result-path)) ; Add nA to the result
     ;; Now the detour should be calculated and added
+    (displayln (reverse result-path))
+    (displayln (neighbours rest-of-path result-path))
     (set! result-path (cons (neighbours rest-of-path result-path) result-path))
     (check-loop (cddr rest-of-path) result-path)
     )
@@ -257,28 +264,24 @@
                     (fix-the-path id1 id2 n1 current-path rest-of-path)
                     (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))))))))
   (define (fix-the-path id1 id2 n1 current-path rest-of-path)
-    (displayln "FIXIN")
-    (set! doubles #t)
+    ;(set! doubles #t)
     (set! current-path (cons (car rest-of-path) current-path)) ;A2
     (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx ; Has to stay for setting tth switch
     (set! current-path (cons id1 current-path)) ;A1
     (set! current-path (cons n1 current-path)) ;Bx
     (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
     (define neighbours (find-neighbours (cadr rest-of-path)))
-    (display "Neigbours ")(displayln neighbours)
     (define neighbour (correct-neigbour (cadr rest-of-path) n1 neighbours))
     (set! current-path (cons neighbour current-path)) ;Nm
     (set! neighbours (find-neighbours neighbour))
     (set! neighbours (remove neighbour neighbours))
     (set! current-path (cons (car neighbours) current-path)) ;Lg
-    (display "neighbour ")(displayln neighbour)
     (set! current-path (cons neighbour current-path)) ;Nm
     (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
     (set! current-path (cons n1 current-path)) ;Bx
     (set! current-path (cons id2 current-path)) ;Gt
     (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
     (set! current-path (cons (caddr rest-of-path) current-path)) ;Bg
-    (displayln current-path)
     (check-loop current-path (cddr rest-of-path)))
   (check-loop '() schedule))
 
@@ -298,4 +301,13 @@
         (loop (cdr rem-neighbours))))
   (loop neighbours))
 
-(define railwaymodel (load-rwm "be_simple.txt"))
+(define (find-next-neighbour node switch-node neighbours)
+  (define switch (find-railwaypiece node switch-node))
+  (define (loop rem-neighbours)
+    (when (not (null? rem-neighbours))
+               (if (eq? switch (find-railwaypiece node (car rem-neighbours)))
+                   (loop (cdr rem-neighbours))
+                   (car rem-neighbours))))
+    (loop neighbours))
+
+  (define railwaymodel (load-rwm "be_simple.txt"))

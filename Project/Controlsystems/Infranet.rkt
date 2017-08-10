@@ -55,7 +55,9 @@
       (set! path (cons (string->symbol (car str-list)) path))
       (path-loop (cdr str-list))))
   (path-loop (cdr string))
-  ((infrabel 'set-new-destination!) train-id (reverse path))
+	(set! path (reverse path))
+  ((infrabel 'set-new-destination!) train-id path)
+	(displayln path)
   )
 
 (define (server)
