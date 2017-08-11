@@ -219,8 +219,8 @@
             (dt-loop node2 node1 result)))
       (define node1 (cadr rest-of-path))
       (define prev (car rest-of-path))
-      (set! result-path (cons (dt-loop node1 prev '())
-                              node1))
+      (set! result-path (dt-loop node1 prev '())
+                              )
       (displayln result-path)
       result-path)
     (set! result-path (cons (car rest-of-path) result-path)) ; Add nB to the result
