@@ -16,8 +16,8 @@
 (define loop #t)
 ;(define port (random 2000 65535)) (display port)
 (define port 29486)
-;(define host "192.168.0.160")
-(define host "volumio.local")
+(define host "localhost")
+;(define host "volumio.local")
 
 (set-up-client port host)
 
