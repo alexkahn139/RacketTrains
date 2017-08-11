@@ -5,18 +5,18 @@
 ;; Copyright 2017 Alexandre Kahn 2BA CW ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require (prefix-in sim: "simulator/interface.rkt"))
-(require (prefix-in real: "z21-scheme/FullAPI/Z21Socket.rkt"))
-(require (prefix-in real: "z21-scheme/FullAPI/Z21MessageDriving.rkt"))
-(require (prefix-in real: "z21-scheme/FullAPI/Z21MessageSwitches.rkt"))
-(require (prefix-in real: "z21-scheme/FullAPI/Z21MessageLocation.rkt"))
-(require (prefix-in real: "z21-scheme/APITesting/MessageHandler.rkt"))
-(require "z21-scheme/FullAPI/racket-bits-utils-master/bits.rkt")
+(require (prefix-in sim: "../Railways/Simulator/interface.rkt"))
+(require (prefix-in real: "../Railways/z21-scheme/FullAPI/Z21Socket.rkt"))
+(require (prefix-in real: "../Railways/z21-scheme/FullAPI/Z21MessageDriving.rkt"))
+(require (prefix-in real: "../Railways/z21-scheme/FullAPI/Z21MessageSwitches.rkt"))
+(require (prefix-in real: "../Railways/z21-scheme/FullAPI/Z21MessageLocation.rkt"))
+(require (prefix-in real: "../Railways/z21-scheme/APITesting/MessageHandler.rkt"))
+(require "../Railways/z21-scheme/FullAPI/racket-bits-utils-master/bits.rkt")
 
 (provide make-railway)
 
 (define (make-railway sim) ; Sim should be a boolean
-  
+
   (define scale 10)
   (define socket #f)
 
@@ -70,7 +70,7 @@
             ((lsb (map-switch-id id))
              (msb "01"))
           (real:send socket (real:make-set-switch-msg lsb msb #t pos)))))
-  
+
   (define (map-switch-id i)
     (define id-string (number->string i))
     (define res (assoc i adress-list))
@@ -78,7 +78,7 @@
         (cadr res)
         (error 'Z21-SWITCH (string-append id-string ": " "ID DOES NOT EXISTS!"))
         ))
-  
+
   (define adress-list
     (list
      (list 1 "00")
@@ -124,4 +124,3 @@
       (startZ21))
   dispatch)
 ;(define zz (make-railway #t))
-
