@@ -7,8 +7,16 @@
 
 (require "../Project/Controlsystems/Infrabel.rkt")
 (require "../Project/Controlsystems/Infranet.rkt")
+(require racket/cmdline)
 
-(define infrabel (make-infrabel #t))
+(define sim #f)
+
+(command-line
+	#:once-each
+	[("--simulated" "-s" ) "Use the simulator"
+		(set! sim #t)])
+
+(define infrabel (make-infrabel sim))
 (define loop #t)
 (define port 29486)
 

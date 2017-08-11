@@ -17,7 +17,7 @@
 
 (define listen-thread #f)
 
-(define SERVICE-PORT 4000) ; Should be an unused port
+(define SERVICE-PORT 0) ; Should be an unused port
 (define max-allowed-wait 4)
 
 ; Stringifier, om nuttige informatie in een string te duwen
