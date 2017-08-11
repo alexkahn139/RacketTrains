@@ -215,7 +215,7 @@
         (set! result (cons node1 result))
         (display "Result is : ")(displayln result)
         (if (eq? 'detection-track (track 'get-type))
-            (flatten (list (reverse result) node2 result))
+ 						(list (reverse result) node2 result)
             (dt-loop node2 node1 result)))
       (define node1 (cadr rest-of-path))
       (define prev (car rest-of-path))
@@ -223,7 +223,6 @@
                               node1))
       (displayln result-path)
       result-path)
-
     (set! result-path (cons (car rest-of-path) result-path)) ; Add nB to the result
     ;(set! result-path (cons (cadr rest-of-path) result-path)) ; Add nA to the result
     ;; Now the detour should be calculated and added

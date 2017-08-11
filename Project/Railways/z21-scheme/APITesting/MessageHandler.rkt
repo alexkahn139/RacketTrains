@@ -5,7 +5,8 @@
 ;; fmyter@vub.ac.be       ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require "../FullAPI/Z21MessageSysStat.rkt" "../FullAPI/Z21MessageSettings.rkt" "../FullAPI/Z21MessageDriving.rkt" "../FullAPI/Z21MessageLocation.rkt" "../FullAPI/Z21MessageSwitches.rkt" "../FullAPI/Z21MessageDecoderCV.rkt"  "../FullAPI/racket-bits-utils-master/bits.rkt")
-(provide handle-msg)
+(provide handle-msg
+         locations)
 
 (define (handle-msg msg)
   (cond
@@ -196,8 +197,11 @@
   (newline)
   (display (string-append "GROUP INDEX: " (number->string (get-rmbus-data-group-index msg))))
   (newline)
+  (define data (get-rmbus-data msg))
   (print-module-location-info (get-rmbus-data msg))
-  (newline))
+  (newline)
+  (location-info-to-list (get-rmbus-data msg))
+  )
 
 (define (print-module-location-info data)
   (when (not (empty? data))
@@ -215,3 +219,14 @@
       (newline)
       (print-occ-location-info (cdr occ-info)))))
 
+(define locations '())
+
+(define (location-info-to-list data)
+  (display "ok")
+  (set! locations '())
+  (define (location-loop data)
+    (when (and (not (null? data)) (not (empty? (car data))))
+      (display (get-module (car data))) (displayln (get-occupancies (car data)))
+      (set! locations (cons (cons (get-module (car data)) (get-occupancies (car data))) locations))
+      (location-loop (cdr data))))
+  (location-loop data))
