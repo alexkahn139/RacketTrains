@@ -10,7 +10,7 @@
 (define (make-train id)
 
 
-  (define max-speed 3)
+  (define max-speed 1)
   (define schedule '())
   (define direction 1)
 	(define next-detection-track '())

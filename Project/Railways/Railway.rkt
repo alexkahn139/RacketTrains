@@ -47,7 +47,7 @@
           (real:send socket (real:make-set-loco-drive-msg lsb msb 128 dir speed)))))
 
   (define (get-locomotive-location id)
-    (sleep 1)
+    ;(sleep 1)
     (if sim
         (sim:get-loco-detection-block id)
         (begin
