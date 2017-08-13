@@ -11,6 +11,16 @@
 
   (define type 'track)
 
+  (define reserved #f)
+
+  (define (reserve! id) ; A number is always #t
+    (when (not reserved)
+      (set! reserved id)))
+
+  (define (free!)
+    (set! reserved #f))
+
+
   (define (dispatch msg)
     (cond
       ; getters
@@ -18,6 +28,9 @@
       ((eq? msg 'get-node1) node1)
       ((eq? msg 'get-node2) node2)
       ((eq? msg 'get-max-speed) max-speed)
+      ((eq? msg 'reserved?) reserved)
+      ((eq? msg 'free!) free!)
+      ((eq? msg 'reserve!) reserve!)
       (else
        (error "Message not understood" msg))))
   dispatch)

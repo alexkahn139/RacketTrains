@@ -22,5 +22,5 @@
       ((eq? msg 'get-id) id)
       ; setters
       (else
-       (error "Message not understood " msg))))
+       (error "Message not understood - DT " msg))))
   dispatch)
