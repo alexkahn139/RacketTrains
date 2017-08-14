@@ -70,6 +70,13 @@
     (define schedule (train 'get-schedule))
     (define (arrived)
       (set-locomotive-speed! (train 'get-id) 0)
+      (define (loop rst-sched)
+        (when (> 2 (length rst-sched))
+          (define track (find-railwaypiece (car rst-sched) (cadr rst-sched)))
+          (when (and track (not (eq? 'detection-track (track 'get-type))))
+            ((track 'free!)))
+          (loop (cdr rst-sched))))
+      (loop schedule)
       (clear-schedule train))
     (if (> 2 (length schedule))
         (set-locomotive-speed! (train 'get-id) 0)
@@ -81,8 +88,9 @@
             (cond ((eq? (last-dt 'get-id) (hash-ref locations  (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
                   ((eq? (hash-ref locations  (train 'get-id)) (det 'get-id)) (find-next-dt train (cdr schedule)))
                   ((get-light det) (set-locomotive-speed! (train 'get-id) 0)); If there is another train, othe train stops
-                  ((check-reservations train) (set-locomotive-speed! (train 'get-id) (calculate-train-movement train))))))))
-
+                  ((or #t (check-reservations train)) (set-locomotive-speed! (train 'get-id) (calculate-train-movement train)))
+                  )))))
+  
   (define (check-reservations train)
     (define id (train 'get-id))
     (define safe #t)
@@ -104,9 +112,12 @@
   (define (fix-schedule train next-dt rest-schedule) ; Function to delete te part of the schedule that's already driven
     (when (> (length rest-schedule) 2)
       (define testtrack (find-railwaypiece (car rest-schedule) (cadr rest-schedule)))
-      (if (and testtrack (eq? 'detection-track (testtrack 'get-type)))
-          (begin ((train 'set-schedule!) (cdr rest-schedule))
-                 (find-next-dt train (cdr (cdr rest-schedule))))
+      (if testtrack
+          (if (eq? 'detection-track (testtrack 'get-type))
+              (begin ((train 'set-schedule!) (cdr rest-schedule))
+                     (find-next-dt train (cdr (cdr rest-schedule))))
+              (begin ((testtrack 'free!))
+                     (fix-schedule train next-dt (cdr rest-schedule))))
           (fix-schedule train next-dt (cdr rest-schedule)))))
 
   (define (find-next-dt train schedule)

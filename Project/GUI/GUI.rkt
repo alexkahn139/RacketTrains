@@ -21,7 +21,7 @@
 
 
 
-(define size 800)
+(define size 1000)
 ; Load all the bitmaps
 (define locomotive  (read-bitmap "GUI/loco.jpeg"))
 
@@ -44,7 +44,7 @@
                          [width size]
                          [height size]))
 (define (scale coordinate)
-  (/ (* coordinate size) 680))
+  (/ (* coordinate size) 1000))
 
 ; Get all the things that should be drawn (Locomotives, nodes, tracks switches) and put them in a list
 (define (get-nodes)
