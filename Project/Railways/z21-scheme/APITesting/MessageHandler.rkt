@@ -82,7 +82,7 @@
   (display "ALL TRAFFIC HAS BEEN STOPPED")
   (newline)
   (newline))
-  
+
 (define (handle-firmware msg)
   (display (string-append "FIRMWARE ANSWER: " (get-firmware-version msg)))
   (newline)
@@ -139,7 +139,7 @@
 ;Prints the status of the loc functions (we assume that the loc has 22 functions)
 (define (print-loc-info-functions msg i)
   (when (not (= i 23))
-    (begin 
+    (begin
       (display (string-append "LOC FUNCTION " (number->string i) " ON? : " (format "~a" (loco-info-func-on? msg i))))
       (newline)
       (print-loc-info-functions msg (+ i 1)))))
@@ -193,13 +193,13 @@
   (newline))
 
 (define (handle-location-changed-msg msg)
-  (display "LOCATION INFO => ")
-  (newline)
-  (display (string-append "GROUP INDEX: " (number->string (get-rmbus-data-group-index msg))))
-  (newline)
+  ;(display "LOCATION INFO => ")
+  ;(newline)
+  ;(display (string-append "GROUP INDEX: " (number->string (get-rmbus-data-group-index msg))))
+  ;(newline)
   (define data (get-rmbus-data msg))
-  (print-module-location-info (get-rmbus-data msg))
-  (newline)
+  ;(print-module-location-info (get-rmbus-data msg))
+  ;(newline)
   (location-info-to-list (get-rmbus-data msg))
   )
 
@@ -222,11 +222,15 @@
 (define locations '())
 
 (define (location-info-to-list data)
-  (display "ok")
   (set! locations '())
   (define (location-loop data)
     (when (and (not (null? data)) (not (empty? (car data))))
-      (display (get-module (car data))) (displayln (get-occupancies (car data)))
-      (set! locations (cons (cons (get-module (car data)) (get-occupancies (car data))) locations))
+      ;(display (get-module (car data))) (displayln (get-occupancies (car data)))
+      (define module (get-module (car data)))
+			(define occupancies (get-occupancies (car data)))
+      (when (not (empty? occupancies))
+        (define occupancy (car occupancies))
+        (set! locations (cons (cons module occupancy) locations)))
+      ;(set! locations (cons (cons (get-module (car data)) (get-occupancies (car data))) locations))
       (location-loop (cdr data))))
   (location-loop data))

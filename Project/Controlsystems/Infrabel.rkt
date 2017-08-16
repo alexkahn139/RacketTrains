@@ -43,6 +43,7 @@
                                            (define next-dt (train 'get-next-dt))
                                            (get-locomotive-location (train 'get-id))
                                            (define location (hash-ref locations (train 'get-id)))
+																					 ;(display location)
                                            (when location
                                              ;(displayln (hash-ref locations (train 'get-id)))
                                              (define schedule (train 'get-schedule))
@@ -90,7 +91,7 @@
                   ((get-light det) (set-locomotive-speed! (train 'get-id) 0)); If there is another train, othe train stops
                   ((or #t (check-reservations train)) (set-locomotive-speed! (train 'get-id) (calculate-train-movement train)))
                   )))))
-  
+
   (define (check-reservations train)
     (define id (train 'get-id))
     (define safe #t)
