@@ -192,16 +192,13 @@
   (newline)
   (newline))
 
-(define (handle-location-changed-msg msg)
-  ;(display "LOCATION INFO => ")
-  ;(newline)
-  ;(display (string-append "GROUP INDEX: " (number->string (get-rmbus-data-group-index msg))))
-  ;(newline)
+;; !!!
+(define (handle-location-changed-msg msg) ; Changed by Alexandre Kahn
   (define data (get-rmbus-data msg))
-  ;(print-module-location-info (get-rmbus-data msg))
-  ;(newline)
   (location-info-to-list (get-rmbus-data msg))
   )
+
+;; !!!
 
 (define (print-module-location-info data)
   (when (not (empty? data))
@@ -221,16 +218,17 @@
 
 (define locations '())
 
-(define (location-info-to-list data)
+
+;; !!!
+(define (location-info-to-list data) ; Added by Alexandre Kahn
   (set! locations '())
   (define (location-loop data)
     (when (and (not (null? data)) (not (empty? (car data))))
-      ;(display (get-module (car data))) (displayln (get-occupancies (car data)))
       (define module (get-module (car data)))
 			(define occupancies (get-occupancies (car data)))
       (when (not (empty? occupancies))
         (define occupancy (car occupancies))
         (set! locations (cons (cons module occupancy) locations)))
-      ;(set! locations (cons (cons (get-module (car data)) (get-occupancies (car data))) locations))
       (location-loop (cdr data))))
   (location-loop data))
+;; !!!

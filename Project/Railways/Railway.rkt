@@ -17,7 +17,7 @@
 
 (define (make-railway sim) ; Sim should be a boolean
 
-  (define scale 10)
+  (define scale 100)
   (define socket #f)
 
   (define (startZ21)
@@ -37,19 +37,16 @@
 
 
   (define (set-loco-speed! id speed)
-		(displayln "SPEEEEEEEED")
     (if sim
         (sim:set-loco-speed! id speed)
         (let*
             ((lsb (byte->hex-string 3))
              (msb "00")
              (dir (> speed 0))
-             (speed (abs (* 100 speed))))
-					;(real:send get-loco-info-message (make-get-loco-info-msg "03" "00"))
+             (speed (abs (* scale speed))))
           (real:send socket (real:make-set-loco-drive-msg lsb msb 128 dir speed)))))
 
   (define (get-locomotive-location id)
-    ;(sleep 1)
     (if sim
         (sim:get-loco-detection-block id)
         (begin
@@ -80,7 +77,7 @@
         (error "Z21-SWITCH " i " ID DOES NOT EXISTS!"))
         )
 
-  (define adress-list
+  (define adress-list ; Switches in comment don't work
     (list
      (list '|1| "00")
      (list '|2| "01")
@@ -124,4 +121,3 @@
       (sim:start-simulator)
       (startZ21))
   dispatch)
-;(define zz (make-railway #t))

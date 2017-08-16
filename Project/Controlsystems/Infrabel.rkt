@@ -43,9 +43,7 @@
                                            (define next-dt (train 'get-next-dt))
                                            (get-locomotive-location (train 'get-id))
                                            (define location (hash-ref locations (train 'get-id)))
-																					 ;(display location)
                                            (when location
-                                             ;(displayln (hash-ref locations (train 'get-id)))
                                              (define schedule (train 'get-schedule))
                                              (when (and (pair? next-dt)
                                                         (eq? (hash-ref locations (train 'get-id)) location))
