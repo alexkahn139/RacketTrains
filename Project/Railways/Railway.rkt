@@ -69,8 +69,8 @@
             ((lsb (map-switch-id id))
              (msb "01"))
 					(if lsb
-          	(real:send socket (real:make-set-switch-msg lsb msb #t pos)
-						(display "!!!SWITCH NOT IN MODELTRACK!!!"))))))
+          	(real:send socket (real:make-set-switch-msg lsb msb #t pos))
+						(display "!!!SWITCH NOT IN MODELTRACK!!!")))))
 
   (define (map-switch-id i)
     (define res (assoc i adress-list))
