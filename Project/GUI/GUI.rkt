@@ -214,12 +214,15 @@
   (define occupied-list (get-all 'get-all-dt))
   (define loco-list (get-all 'get-all-loco))
   (set! nmbs NMBS)
+	(send canvas suspend-flush)
   (send dc erase)
   (draw-switches)
   (draw-dt occupied-list)
   (draw-tracks)
   (draw-nodes)
-  (draw-locos loco-list))
+  (draw-locos loco-list)
+	(send canvas flush)
+	(send canvas resume-flush))
 
 
 ; Make a button in the frame
