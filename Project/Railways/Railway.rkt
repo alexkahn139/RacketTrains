@@ -68,41 +68,30 @@
         (let*
             ((lsb (map-switch-id id))
              (msb "01"))
-          (real:send socket (real:make-set-switch-msg lsb msb #t pos)))))
+					(if lsb
+          	(real:send socket (real:make-set-switch-msg lsb msb #t pos)
+						(display "!!!SWITCH NOT IN MODELTRACK!!!"))))))
 
   (define (map-switch-id i)
     (define res (assoc i adress-list))
     (if res
         (cadr res)
-        (error "Z21-SWITCH " i " ID DOES NOT EXISTS!"))
-        )
+        #f))
 
-  (define adress-list ; Switches in comment don't work
+  (define adress-list ; Other switches don't work
     (list
      (list '|1| "00")
      (list '|2| "01")
      (list '|3| "02")
      (list '|4| "03")
-     ;(list 5 "")
      (list '|6| "00")
      (list '|7| "02")
-     ;(list 8 "")
      (list '|9| "00")
      (list '|10| "01")
      (list '|11| "02")
      (list '|12| "03")
-     ;(list 13 "")
-     ;(list 14 "")
-     ;(list 15 "")
-     ;(list 16 "")
-     ;(list 17 "")
-     ;(list 18 "")
-     ;(list 19 "")
      (list '|20| "03")
-     ;(list 21 "")
-     ;(list 22 "")
      (list '|23| "02")
-     ;(list 24 "")
      (list '|25| "00")
      (list '|26| "01")
      (list '|28| "03")))
