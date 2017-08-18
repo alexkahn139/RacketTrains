@@ -14,7 +14,9 @@
 (require racket/gui/base)
 
 (provide
- draw-all)
+ draw-all
+ get-loco-location
+ )
 
 (define nmbs '())
 (define train-list '())
@@ -126,6 +128,10 @@
          (set! dt (find-dt det-id)))
        (set! loco-list (cons (list id dt) loco-list)))))
   loco-list)
+
+(define (get-loco-location id)
+	(define loc-list (get-all 'get-all-loco))
+	(search-in-list id loc-list))
 
 ; Draw functions, they use the list to correctly model the railwaymodel
 (define (draw-nodes)

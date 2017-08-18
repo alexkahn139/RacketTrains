@@ -15,3 +15,4 @@ Project/.DS_Store
 #*.rkt*
 Reports
 Project/ADT/compiled
+*.rkt#2#
