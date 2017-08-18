@@ -44,7 +44,7 @@
 (define (get-all msg)
 	(client msg))
 
-(define (send-path train-id path)
+(define (send-path train-id path) ; Translate the path to a string
   (displayln path)
   (define output (number->string train-id))
   (define (list-to-string list)
@@ -54,7 +54,6 @@
       (list-to-string (cdr list))))
   (list-to-string path)
   (client output))
-
 
 (define (set-up-client port host)
   (set! SERVER-HOST host)

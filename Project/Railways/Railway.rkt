@@ -104,8 +104,9 @@
 
       ((eq? msg 'set-switch-position!) set-switch-position!)
       ((eq? msg 'set-loco-speed!) set-loco-speed!)
-      (else (error "Unknown message" msg))
-      ))
+      (else (error "Unknown message" msg))))
+
+	; Initializes the simulator or the Z21
   (if sim
       (sim:start-simulator)
       (startZ21))

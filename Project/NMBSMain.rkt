@@ -14,14 +14,13 @@
 
 (define NMBS (make-nmbs))
 (define loop #t)
-;(define port (random 2000 65535)) (display port)
-(define port 29486)
+(define port 29486) ; Is a port that is almost always free
 (define host "localhost")
-;(define host "volumio.local")
+;(define host "volumio.local") ; Name of my Raspberry Pi, which is also an volumio server
 
 (set-up-client port host)
 
-(define (nmbs-loop)
+(define (nmbs-loop) ; The program-loop
   (sleep 0.02)
   (draw-all NMBS)
   (when loop
@@ -30,4 +29,4 @@
 (when loop
   (thread nmbs-loop))
 
-(define test (make-test NMBS))
+(define test (make-test NMBS)) ; Initializes the test suite

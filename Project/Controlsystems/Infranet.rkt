@@ -17,7 +17,7 @@
 
 (define listen-thread #f)
 
-(define SERVICE-PORT 0) ; Should be an unused port
+(define SERVICE-PORT #f) ; Should be an unused port
 (define max-allowed-wait 4)
 
 ; Stringifier, om nuttige informatie in een string te duwen
@@ -46,7 +46,7 @@
   (set! output (string-append (list-to-string list output)))
   output)
 
-(define (translate-path string)
+(define (translate-path string) ; Changes the string in to a usable path that can be used by a train
   (define path '())
   (set! string (string-split string))
   (define train-id (string->number (car string)))
@@ -60,12 +60,11 @@
 	(displayln path)
   )
 
-(define (server)
+(define (server) ; This is the TCP server. It has a few messages to wich it responds with a specific function
   (let ([listener (tcp-listen SERVICE-PORT)])
     (define (loop)
       (let-values ([(client->me me->client)
                     (tcp-accept listener)])
-        ; Hier conditional, voor al de mogelijke inkomende boodschappen
         (let ((message "msg not understood"))
           (define msg (read client->me))
           (cond
@@ -74,12 +73,10 @@
             ((eq? msg 'get-all-loco) (set! message (stringify 'locomotive ((infrabel 'get-all-loco)))))
             ((eq? msg 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
             ; Put commands
-            ; Need to find a way, to split the msg and the args
             (else
               (begin
                 (translate-path msg)
-                (set! message 'Received-new-path)))
-            )
+                (set! message 'Received-new-path))))
           (close-input-port client->me)
           (write message me->client)
           (close-output-port me->client)))

@@ -27,7 +27,7 @@
 		(wait-loop 1 1 8 12)
 		(wait-loop 1 1 12 5))
 
-	(define (two-trains)
+	(define (two-trains) ; This is a test to show that two trains will not collide
 		((NMBS 'schedule-destination!) 1 2)
 		(wait-loop 1 2 2 5)
 		((NMBS 'schedule-destination!) 1 4))

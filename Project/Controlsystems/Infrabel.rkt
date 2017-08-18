@@ -48,10 +48,8 @@
                                              (when (and (pair? next-dt)
                                                         (eq? (hash-ref locations (train 'get-id)) location))
                                                (fix-schedule train next-dt schedule))
-                                             (fix-switches train (train 'get-schedule))
-                                             )
-                                           (drive-train train)
-                                           )))
+                                             (fix-switches train (train 'get-schedule)))
+                                           (drive-train train))))
 
   (define (get-light track) ; Returns true, when the light is red
     (define track-id (track 'get-id))
@@ -60,9 +58,8 @@
      (rwm-ls railwaymodel)
      (lambda (id loco)
        (define id (loco 'get-id))
-       (if (eq? (hash-ref locations (loco 'get-id)) track-id)
-           (set! light #t)
-           'ok)))
+       (when (eq? (hash-ref locations (loco 'get-id)) track-id)
+           (set! light #t))))
     light)
 
   (define (drive-train train) ; Makes the train move if needed, by calculating the max allowed speed
@@ -87,10 +84,9 @@
             (cond ((eq? (last-dt 'get-id) (hash-ref locations  (train 'get-id))) (arrived)) ; If the train is on the final block it should come to a stop and the schedule should be deleted
                   ((eq? (hash-ref locations  (train 'get-id)) (det 'get-id)) (find-next-dt train (cdr schedule)))
                   ((get-light det) (set-locomotive-speed! (train 'get-id) 0)); If there is another train, othe train stops
-                  ((or #t (check-reservations train)) (set-locomotive-speed! (train 'get-id) (calculate-train-movement train)))
-                  )))))
+                  ((or #t (check-reservations train)) (set-locomotive-speed! (train 'get-id) (calculate-train-movement train))))))))
 
-  (define (check-reservations train)
+  (define (check-reservations train) ; Checks the reservations until the next dt
     (define id (train 'get-id))
     (define safe #t)
     (define (loop rst-sched)
@@ -149,7 +145,7 @@
         (set-loop (cdr rst-sched))))
     (set-loop schedule))
 
-  (define (calculate-switch switch nA nB)
+  (define (calculate-switch switch nA nB) ; The displays in comment are left, because they are useful when the railwaymodel isn't correctly build
     ;(display "Calculating switch: ") (display (switch 'get-id)) (display " nA ") (display nA) (display " nB ") (display nB)
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
@@ -166,9 +162,7 @@
 					 (set-switch-state! id 1))
           ((and (eqv? n1 nB) (eqv? n3 nA))
            ;(begin (set-switch-state! id 2) (display "setted to ") (displayln 2)))
-					 (set-switch-state! id 2))
-          )
-    )
+					 (set-switch-state! id 2))))
 
   (define (calculate-direction train nodeA nodeB)
     (define track (find-railwaypiece (car (train 'get-next-dt)) (cdr (train 'get-next-dt))))
@@ -176,7 +170,7 @@
         ((train 'set-direction!) +1)
         ((train 'set-direction!) -1)))
 
-  (define (calculate-train-movement train)
+  (define (calculate-train-movement train) ; Calculates the speed of the trains
     (define schedule (train 'get-schedule))
     (define loco-speed (train 'get-max-speed))
     (calculate-direction train (car schedule) (cadr schedule))
@@ -219,7 +213,6 @@
       ; Setters
       ((eq? msg 'set-switch-state!) set-switch-state!)
       ((eq? msg 'set-new-destination!) set-new-destination!)
-      (else (error "Unknown message"))
-      ))
+      (else (error "Unknown message"))))
 
   dispatch)

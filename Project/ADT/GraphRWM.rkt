@@ -102,13 +102,13 @@
      lines)
     (rwm ls ns node-graph)))
 
-(define (find-railwaypiece node1 node2)
+(define (find-railwaypiece node1 node2) ; Returns a specific railwaypiece
   (let*
       ((graph-n1 (hash-ref node-dict node1))
        (graph-n2 (hash-ref node-dict node2)))
     (edge-label node-graph graph-n1 graph-n2)))
 
-(define (all-pieces)
+(define (all-pieces) ; returns a list of all the railwaypieces
   (define tracks '())
   (dft node-graph
        root-nop
@@ -118,7 +118,7 @@
        edge-nop)
   (remove-duplicates tracks))
 
-(define (all-dt)
+(define (all-dt) ; Returns a list of all the dt's
   (define tracks '())
   (dft node-graph
        root-nop
@@ -131,7 +131,7 @@
            (set! tracks (cons edge-label tracks)))))
   (remove-duplicates tracks))
 
-(define (all-switches)
+(define (all-switches) ; Returns a list of all the switches
   (define tracks '())
   (dft node-graph
        root-nop
@@ -144,7 +144,7 @@
            (set! tracks (cons edge-label tracks)))))
   (remove-duplicates tracks))
 
-(define (all-tracks)
+(define (all-tracks) ; Returns a list of all the tracks
   (define tracks '())
   (dft node-graph
        root-nop
@@ -196,19 +196,12 @@
     (set! path (cons node-D path)))
   (reverse path))
 
-;; Fixen van switchen,
-;;; Kijken of 2 deel uitmaken van dezelfde switche
-;;; Zo nee ID ertussen proppen en dan verder zien
 
 (define (fix-switches schedule)
-  (displayln "SWITCHES ARE ")
-  ; Different options can cause problems
   ;;; - The path uses the same switch in a row (nB->nA->nC). The solution is to make the train drive another path until a DT
-  ;;; - The other problem is when to switches follow each other and the second switch is not detected correctly
   (define (make-detour rest-of-path result-path)
     (define (neighbours rest-of-path result-path)
       (define (dt-loop node1 prev result)
-        ;(displayln (find-neighbours node1))
         (define node2 (find-next-neighbour node1 prev (find-neighbours node1)))
         (display "node2 ")(displayln node2)
         (define track (find-railwaypiece node1 node2))
@@ -219,18 +212,14 @@
             (dt-loop node2 node1 result)))
       (define node1 (cadr rest-of-path))
       (define prev (car rest-of-path))
-      (set! result-path (dt-loop node1 prev '())
-                              )
-      (displayln result-path)
+      (set! result-path (dt-loop node1 prev '()))
       result-path)
-    (set! result-path (cons (car rest-of-path) result-path)) ; Add nB to the result
-    ;(set! result-path (cons (cadr rest-of-path) result-path)) ; Add nA to the result
+    (set! result-path (cons (car rest-of-path) result-path))
     ;; Now the detour should be calculated and added
     (displayln (reverse result-path))
     (displayln (neighbours rest-of-path result-path))
     (set! result-path (cons (neighbours rest-of-path result-path) result-path))
-    (check-loop (cddr rest-of-path) result-path)
-    )
+    (check-loop (cddr rest-of-path) result-path))
   (define path '())
   (define (check-loop rest-of-path result-path) ; Only if the track could be a switch a test is needed
     (cond
@@ -243,49 +232,6 @@
       (else (check-loop (cdr rest-of-path) (cons (car rest-of-path) result-path)))))
   (check-loop schedule '()))
 
-(define (fix-double-switches schedule)
-  (define doubles #f)
-  (define (check-loop current-path rest-of-path)
-    (if (> 2 (length rest-of-path))
-        (if doubles
-            (reverse (cons (car rest-of-path) current-path))
-            (fix-switches (reverse (cons (car rest-of-path) current-path))))
-        (let* ((label (label node-graph (hash-ref node-dict (cadr rest-of-path)))))
-          (if (eq? 'no-label label)
-              (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))
-              (let* ((switch label)
-                     (id1 ((find-railwaypiece (car rest-of-path) (cadr rest-of-path)) 'get-id))
-                     (id2 ((find-railwaypiece (cadr rest-of-path) (caddr rest-of-path)) 'get-id))
-                     (n1 (switch 'get-node1))
-                     )
-                (if (and (not (eq? id1 n1))
-                         (not (eq? id2 n1)))
-                    (fix-the-path id1 id2 n1 current-path rest-of-path)
-                    (check-loop (cons (car rest-of-path) current-path) (cdr rest-of-path))))))))
-  (define (fix-the-path id1 id2 n1 current-path rest-of-path)
-    ;(set! doubles #t)
-    (set! current-path (cons (car rest-of-path) current-path)) ;A2
-    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx ; Has to stay for setting tth switch
-    (set! current-path (cons id1 current-path)) ;A1
-    (set! current-path (cons n1 current-path)) ;Bx
-    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
-    (define neighbours (find-neighbours (cadr rest-of-path)))
-    (define neighbour (correct-neigbour (cadr rest-of-path) n1 neighbours))
-    (set! current-path (cons neighbour current-path)) ;Nm
-    (set! neighbours (find-neighbours neighbour))
-    (set! neighbours (remove neighbour neighbours))
-    (set! current-path (cons (car neighbours) current-path)) ;Lg
-    (set! current-path (cons neighbour current-path)) ;Nm
-    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
-    (set! current-path (cons n1 current-path)) ;Bx
-    (set! current-path (cons id2 current-path)) ;Gt
-    (set! current-path (cons (cadr rest-of-path) current-path)) ;Mx
-    (set! current-path (cons (caddr rest-of-path) current-path)) ;Bg
-    (check-loop current-path (cddr rest-of-path)))
-  (check-loop '() schedule))
-
-
-
 (define (find-neighbours node)
   (set! node (hash-ref node-dict node))
   (define neighbours '())
@@ -293,14 +239,7 @@
                                    (set! neighbours (cons (real-node edge-to) neighbours))))
   neighbours)
 
-(define (correct-neigbour node id neighbours)
-  (define (loop rem-neighbours)
-    (if (eq? ((find-railwaypiece node (car rem-neighbours)) 'get-id) id)
-        (car rem-neighbours)
-        (loop (cdr rem-neighbours))))
-  (loop neighbours))
-
-(define (find-next-neighbour node switch-node neighbours)
+(define (find-next-neighbour node switch-node neighbours) ; Returns the correct and needed neighbour
   (define switch (find-railwaypiece node switch-node))
   (define (loop rem-neighbours)
     (when (not (null? rem-neighbours))

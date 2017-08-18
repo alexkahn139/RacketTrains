@@ -11,7 +11,7 @@
 
 (define sim #f)
 
-(command-line
+(command-line ; Program can only be started from the command-line
 	#:once-each
 	[("--simulated" "-s" ) "Use the simulator"
 		(set! sim #t)])
@@ -22,7 +22,7 @@
 
 (set-up-server infrabel port)
 
-(define (infra-loop)
+(define (infra-loop) ; The program-loop
   (sleep 0.02)
   ((infrabel 'update))
   (infra-loop))
