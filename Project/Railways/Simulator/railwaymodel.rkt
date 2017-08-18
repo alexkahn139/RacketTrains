@@ -94,7 +94,6 @@
      lines)
     (rwm ls ns ss ts ds)))
 
-; (define rwm-be (load-rwm "be_simple.txt"))
 
 
 ; Checks whether two tracks are equivalent.
