@@ -13,14 +13,14 @@
   (define max-speed 1)
   (define schedule '())
   (define direction 1)
-	(define next-detection-track '())
+  (define next-detection-track '())
 
   (define (set-schedule! schedule-list)
     (set! schedule schedule-list))
 
-	(define (set-next-detection-track! node1 node2)
-		(set! next-detection-track (cons node1 node2))
-		(display "Next dt is: ") (displayln  next-detection-track))
+  (define (set-next-detection-track! node1 node2)
+    (set! next-detection-track (cons node1 node2))
+    (display "Next dt is: ") (displayln  next-detection-track))
 
 
   (define (set-direction! dir)
@@ -33,10 +33,10 @@
       ((eq? msg 'get-direction) direction)
       ((eq? msg 'get-max-speed) max-speed)
       ((eq? msg 'get-schedule) schedule)
-			((eq? msg 'get-next-dt) next-detection-track)
+      ((eq? msg 'get-next-dt) next-detection-track)
       ; Setters
       ((eq? msg 'set-schedule!) set-schedule!)
-			((eq? msg 'set-next-dt!) set-next-detection-track!)
+      ((eq? msg 'set-next-dt!) set-next-detection-track!)
       ((eq? msg 'set-direction!) set-direction!)
       (else
        (error "Message not understood" msg))))

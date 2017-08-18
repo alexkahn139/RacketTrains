@@ -12,9 +12,9 @@
 (define sim #f)
 
 (command-line ; Program can only be started from the command-line
-	#:once-each
-	[("--simulated" "-s" ) "Use the simulator"
-		(set! sim #t)])
+ #:once-each
+ [("--simulated" "-s" ) "Use the simulator"
+                        (set! sim #t)])
 
 (define infrabel (make-infrabel sim))
 (define loop #t)

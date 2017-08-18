@@ -18,7 +18,7 @@
       (set! reserved id)))
 
   (define (free!)
-	;	(display "Freed track: ")(displayln (cons node1 node2))
+    ;	(display "Freed track: ")(displayln (cons node1 node2))
     (set! reserved #f))
 
 
@@ -29,6 +29,7 @@
       ((eq? msg 'get-node1) node1)
       ((eq? msg 'get-node2) node2)
       ((eq? msg 'get-max-speed) max-speed)
+      
       ((eq? msg 'reserved?) reserved)
       ((eq? msg 'free!) free!)
       ((eq? msg 'reserve!) reserve!)

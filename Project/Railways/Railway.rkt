@@ -31,9 +31,9 @@
           (let* ((pair (car rest-locations)))
             (+ (* 8 (- (car pair) 1)) (cdr pair)))
           (list-loop (cdr rest-locations))))
-		(if (not (empty? locations))
-    		(list-loop locations)
-				#f))
+    (if (not (empty? locations))
+        (list-loop locations)
+        #f))
 
 
   (define (set-loco-speed! id speed)
@@ -68,9 +68,9 @@
         (let*
             ((lsb (map-switch-id id))
              (msb "01"))
-					(if lsb
-          	(real:send socket (real:make-set-switch-msg lsb msb #t pos))
-						(display "!!!SWITCH NOT IN MODELTRACK!!!")))))
+          (if lsb
+              (real:send socket (real:make-set-switch-msg lsb msb #t pos))
+              (display "!!!SWITCH NOT IN MODELTRACK!!!")))))
 
   (define (map-switch-id i)
     (define res (assoc i adress-list))
@@ -106,7 +106,7 @@
       ((eq? msg 'set-loco-speed!) set-loco-speed!)
       (else (error "Unknown message" msg))))
 
-	; Initializes the simulator or the Z21
+  ; Initializes the simulator or the Z21
   (if sim
       (sim:start-simulator)
       (startZ21))

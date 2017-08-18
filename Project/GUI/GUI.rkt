@@ -21,8 +21,6 @@
 (define nmbs '())
 (define train-list '())
 
-
-
 (define size 1000)
 ; Load all the bitmaps
 (define locomotive  (read-bitmap "GUI/loco.jpeg"))
@@ -130,8 +128,8 @@
   loco-list)
 
 (define (get-loco-location id)
-	(define loc-list (get-all 'get-all-loco))
-	(search-in-list id loc-list))
+  (define loc-list (get-all 'get-all-loco))
+  (search-in-list id loc-list))
 
 ; Draw functions, they use the list to correctly model the railwaymodel
 (define (draw-nodes)
@@ -185,15 +183,10 @@
               (define xid (scale (xID switch)))
               (define yid (scale (yID switch)))
               (define sid (sID switch))
-              (send dc set-text-foreground "black")
-              ;(send dc draw-text sid (+ 4 xid) (+ yid 4)) ; Is zelfde als de node
               (set-color! "black")
               (send dc draw-line x1 y1 xid yid)
               (send dc draw-line x2 y2 xid yid)
-              (send dc draw-line x3 y3 xid yid)
-              (send dc set-text-foreground "black")
-              ;(send dc draw-text (number->string (get-switch-position sid)) (+ 4 (/ (+ x1 x2) 2)) (+ (/ (+ y1 y2) 2) 4))
-              )
+              (send dc draw-line x3 y3 xid yid))
             switches))
 
 (define (draw-locos loco-list)
@@ -214,15 +207,15 @@
   (define occupied-list (get-all 'get-all-dt))
   (define loco-list (get-all 'get-all-loco))
   (set! nmbs NMBS)
-	(send canvas suspend-flush)
+  (send canvas suspend-flush)
   (send dc erase)
   (draw-switches)
   (draw-dt occupied-list)
   (draw-tracks)
   (draw-nodes)
   (draw-locos loco-list)
-	(send canvas flush)
-	(send canvas resume-flush))
+  (send canvas flush)
+  (send canvas resume-flush))
 
 
 ; Make a button in the frame

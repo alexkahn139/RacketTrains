@@ -11,9 +11,6 @@
 (require "../Abstractions.rkt")
 (require "../Controlsystems/NMBSnet.rkt")
 
-
-
-
 (provide make-nmbs)
 
 (define (make-nmbs)

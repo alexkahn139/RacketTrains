@@ -12,7 +12,9 @@
          set-up-client
          send-path)
 
-; http://www.cs.utah.edu/plt/mailarch/plt-scheme-2002/msg00955.html, helped me out a lot to start up the server side of things
+; http://www.cs.utah.edu/plt/mailarch/plt-scheme-2002/msg00955.html
+; helped me out a lot to start up the server side of things
+
 (require racket/tcp)
 
 (define SERVICE-PORT 4000) ; Should be an unused port
@@ -42,7 +44,7 @@
          (translate-loop response))))
 
 (define (get-all msg)
-	(client msg))
+  (client msg))
 
 (define (send-path train-id path) ; Translate the path to a string
   (displayln path)

@@ -55,9 +55,9 @@
       (set! path (cons (string->symbol (car str-list)) path))
       (path-loop (cdr str-list))))
   (path-loop (cdr string))
-	(set! path (reverse path))
+  (set! path (reverse path))
   ((infrabel 'set-new-destination!) train-id path)
-	(displayln path)
+  (displayln path)
   )
 
 (define (server) ; This is the TCP server. It has a few messages to wich it responds with a specific function
@@ -74,9 +74,9 @@
             ((eq? msg 'get-all-switch) (set! message (stringify 'switch ((infrabel 'get-all-switch)))))
             ; Put commands
             (else
-              (begin
-                (translate-path msg)
-                (set! message 'Received-new-path))))
+             (begin
+               (translate-path msg)
+               (set! message 'Received-new-path))))
           (close-input-port client->me)
           (write message me->client)
           (close-output-port me->client)))
