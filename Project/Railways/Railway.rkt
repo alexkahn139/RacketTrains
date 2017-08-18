@@ -43,7 +43,7 @@
             ((lsb (byte->hex-string 3))
              (msb "00")
              (dir (> speed 0))
-             (speed (abs (* scale speed))))
+             (speed (abs (* 100 speed))))
           (real:send socket (real:make-set-loco-drive-msg lsb msb 128 dir speed)))))
 
   (define (get-locomotive-location id)
