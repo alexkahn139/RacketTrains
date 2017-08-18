@@ -15,22 +15,28 @@
 
 (define (make-test NMBS)
 
-	(define (wait-loop train-id destination next-destination)
+	(define (wait-loop train-id nxt-train-id destination next-destination)
 		(if (eq? destination (get-loco-location train-id))
-				((NMBS 'schedule-destination!) train-id next-destination)
-				(wait-loop train-id destination next-destination)))
+				((NMBS 'schedule-destination!) nxt-train-id next-destination)
+				(wait-loop train-id nxt-train-id destination next-destination)))
 
 	(define (one-train) ; This is a first test where one train should be driving, this one is just to test that the paths are calculated correctly and the switches are set accordingly
 		((NMBS 'schedule-destination!) 1 1)
-		(wait-loop 1 1 11)
-		(wait-loop 1 11 8)
-		(wait-loop 1 8 12)
-		(wait-loop 1 12 5))
+		(wait-loop 1 1 1 11)
+		(wait-loop 1 1 11 8)
+		(wait-loop 1 1 8 12)
+		(wait-loop 1 1 12 5))
+
+	(define (two-trains)
+		((NMBS 'schedule-destination!) 1 2)
+		(wait-loop 1 2 2 5)
+		((NMBS 'schedule-destination!) 1 4))
 
 
 	(define (dispatch msg)
 		(cond
 			((eq? msg 'one-train) one-train)
+			((eq? msg 'two-trains) two-trains)
 			(else error "Message could not be understood - test " msg)))
 
 	dispatch)

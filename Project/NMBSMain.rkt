@@ -9,7 +9,7 @@
 (require "../Project/Controlsystems/NMBS.rkt")
 (require "../Project/GUI/GUI.rkt")
 (require "../Project/Controlsystems/NMBSnet.rkt")
-
+(require "../Project/Tests.rkt")
 
 
 (define NMBS (make-nmbs))
@@ -29,3 +29,5 @@
 
 (when loop
   (thread nmbs-loop))
+
+(define test (make-test NMBS))

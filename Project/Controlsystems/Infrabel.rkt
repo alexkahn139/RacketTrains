@@ -150,19 +150,23 @@
     (set-loop schedule))
 
   (define (calculate-switch switch nA nB)
-    (display "Calculating switch: ") (display (switch 'get-id)) (display " nA ") (display nA) (display " nB ") (display nB)
+    ;(display "Calculating switch: ") (display (switch 'get-id)) (display " nA ") (display nA) (display " nB ") (display nB)
     (define id (switch 'get-id))
     (define n1 (switch 'get-node1))
     (define n2 (switch 'get-node2))
     (define n3 (switch 'get-node3))
     (cond ((and (eqv? n1 nA) (eqv? n2 nB))
-           (begin (set-switch-state! id 1) (display "setted to ") (displayln 1))) ; Then nB is equal to n3
+           ;(begin (set-switch-state! id 1) (display "setted to ") (displayln 1))) ; Then nB is equal to n3
+					 (set-switch-state! id 1))
           ((and (eqv? n1 nA) (eqv? n3 nB))
-           (begin (set-switch-state! id 2) (display "setted to ") (displayln 2)))
+           ;(begin (set-switch-state! id 2) (display "setted to ") (displayln 2)))
+					 (set-switch-state! id 2))
           ((and (eqv? n1 nB) (eqv? n2 nA))
-           (begin (set-switch-state! id 1) (display "setted to ") (displayln 1)))
+           ;(begin (set-switch-state! id 1) (display "setted to ") (displayln 1)))
+					 (set-switch-state! id 1))
           ((and (eqv? n1 nB) (eqv? n3 nA))
-           (begin (set-switch-state! id 2) (display "setted to ") (displayln 2)))
+           ;(begin (set-switch-state! id 2) (display "setted to ") (displayln 2)))
+					 (set-switch-state! id 2))
           )
     )
 

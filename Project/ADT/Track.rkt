@@ -18,6 +18,7 @@
       (set! reserved id)))
 
   (define (free!)
+	;	(display "Freed track: ")(displayln (cons node1 node2))
     (set! reserved #f))
 
 

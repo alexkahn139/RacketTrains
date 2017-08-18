@@ -18,6 +18,8 @@
       (set! reserved id)))
 
   (define (free!)
+		;(display "Freed track: ")(displayln id)
+
     (set! reserved #f))
 
 
