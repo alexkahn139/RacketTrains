@@ -220,7 +220,7 @@
 
 ; Make a button in the frame
 (define draw-panel (new horizontal-panel% [parent train-frame]
-                        [min-height 760] [stretchable-height #f]))
+                        [min-height 960] [stretchable-height #f]))
 
 (define btn-panel (new horizontal-panel% [parent train-frame]
                        [min-height 40] [stretchable-height #f]))
